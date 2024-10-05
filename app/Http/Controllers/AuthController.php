@@ -10,10 +10,11 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Storage;
 use Str;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\RegisterRequest;
 
 class AuthController extends Controller
 {
-    public function store(Request $request)
+    public function store(RegisterRequest $request)
     {
         $data = [
             "email" => $request->email,
