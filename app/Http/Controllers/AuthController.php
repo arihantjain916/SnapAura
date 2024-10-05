@@ -66,4 +66,23 @@ class AuthController extends Controller
             'user' => $user
         ]);
     }
+
+    public function passwordReset(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            $user->update([
+                'password' => $request->password
+            ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully',
+                'data' => $user
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found',
+        ]);
+    }
 }
