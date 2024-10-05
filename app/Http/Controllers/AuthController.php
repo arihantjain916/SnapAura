@@ -8,6 +8,7 @@ use Http;
 use Illuminate\Http\Request;
 use Storage;
 use Str;
+use App\Http\Requests\UpdateProfileRequest;
 
 class AuthController extends Controller
 {
