@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Auth;
+use Http;
 use Illuminate\Http\Request;
+use Str;
 
 class AuthController extends Controller
 {
@@ -18,7 +20,7 @@ class AuthController extends Controller
         $register = User::create($data);
 
         if ($register) {
-            // $this->sendEmail($isCreate);
+            $this->sendEmail($register);
             return response()->json([
                 'success' => true,
                 'message' => 'User created successfully',
@@ -116,5 +118,21 @@ class AuthController extends Controller
             'success' => false,
             'message' => 'User not found',
         ], 500);
+    }
+
+    protected function sendEmail(object $user)
+    {
+        $app_url = env("APP_URL");
+        $token = Str::random(20);
+        $url = "$app_url/api/verify/email/$user->id/$token";
+        $data = [
+            "email" => $user->email,
+            "body" => "<a>$url</a>"
+        ];
+        $user->update([
+            'remember_token' => $token
+        ]);
+        Http::post("https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjYwNTZkMDYzMjA0M2M1MjY4NTUzZDUxMzQi_pc", $data);
+
     }
 }
