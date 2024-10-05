@@ -3,17 +3,30 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
-Route::get("/",function(){
+Route::get("/", function () {
     return response()->json([
-        "status"=>"success",
-        "message"=>"Welcome to SnapAura API",
+        "status" => "success",
+        "message" => "Welcome to SnapAura API",
         "date" => now()
     ]);
 });
 
-Route::post("register", [AuthController::class, "store"]);
+
 Route::post("reset", [AuthController::class, "passwordReset"]);
-Route::post("login", [AuthController::class, "login"]);
 Route::get("verify/email/{userId}/{token}", [AuthController::class, "verifyEmail"]);
+
+Route::group(["prefix" => "auth"], function () {
+    Route::post("register", [AuthController::class, "register"]);
+    Route::post("login", [AuthController::class, "login"]);
+});
+
+Route::group(["prefix" => "user"], function () {
+    Route::group(["middleware" => "auth:api"], function () {
+        Route::get("profile", [AuthController::class, "profile"]);
+        Route::put("update/profile", [AuthController::class, "updateProfile"]);
+        // Route::get("logout", [AuthController::class, "logout"]);
+    });
+});
+
 
 
