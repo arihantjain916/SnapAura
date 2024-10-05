@@ -11,6 +11,7 @@ use Storage;
 use Str;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
 
 class AuthController extends Controller
 {
@@ -37,7 +38,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
         $user = User::where('email', $request->email)->first();
         if (!$user->email_verified_at) {
