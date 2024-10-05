@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
-Route::get("/api",function(){
+Route::get("/",function(){
     return response()->json([
         "status"=>"success",
         "message"=>"Welcome to SnapAura API",
