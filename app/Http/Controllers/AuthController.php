@@ -57,4 +57,13 @@ class AuthController extends Controller
             'token' => $token,
         ]);
     }
+
+    public function profile()
+    {
+        $user = User::find(Auth::user()->id);
+        return response()->json([
+            'status' => 'success',
+            'user' => $user
+        ]);
+    }
 }
