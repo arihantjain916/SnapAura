@@ -56,7 +56,6 @@ class AuthController extends Controller
             ], 401);
         }
 
-        dd($token);
         $user = Auth::user();
         return response()->json([
             'status' => 'success',
