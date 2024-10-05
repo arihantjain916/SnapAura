@@ -24,7 +24,7 @@ Route::group(["prefix" => "user"], function () {
         Route::get("profile", [AuthController::class, "profile"]);
         Route::put("update/profile", [AuthController::class, "updateProfile"]);
         Route::get("logout", [AuthController::class, "logout"]);
-        Route::post("reset/password", [AuthController::class, "passwordReset"]);
+        Route::put("reset/password", [AuthController::class, "passwordReset"]);
     });
 });
 

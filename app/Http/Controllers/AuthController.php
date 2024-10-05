@@ -12,6 +12,7 @@ use Str;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use Validator;
 
 class AuthController extends Controller
 {
@@ -74,7 +75,16 @@ class AuthController extends Controller
 
     public function passwordReset(Request $request)
     {
-        $user = User::where('email', $request->email)->first();
+        $validate = Validator::make($request->all(), [
+            "password" => "required|string|min:6",
+        ]);
+        if ($validate->fails()) {
+            return response()->json([
+                "status" => "error",
+                "message" => $validate->errors()
+            ]);
+        }
+        $user = User::find(Auth::user()->id);
         if ($user) {
             $user->update([
                 'password' => $request->password
