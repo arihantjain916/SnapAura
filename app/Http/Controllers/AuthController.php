@@ -85,4 +85,36 @@ class AuthController extends Controller
             'message' => 'User not found',
         ]);
     }
+
+    public function verifyEmail(string $userId, string $token)
+    {
+        $user = User::where('id', $userId)->first();
+        if ($user->remember_token != $token) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid token',
+            ], 500);
+        }
+        if ($user) {
+            if ($user->email_verified_at) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email already verified',
+                ], 500);
+            } else {
+                $user->update([
+                    'email_verified_at' => now(),
+                    "remember_token" => null
+                ]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Email verified successfully',
+                ], 200);
+            }
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found',
+        ], 500);
+    }
 }
