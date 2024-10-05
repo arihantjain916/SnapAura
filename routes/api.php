@@ -12,11 +12,10 @@ Route::get("/", function () {
 });
 
 
-Route::post("reset", [AuthController::class, "passwordReset"]);
 Route::get("verify/email/{userId}/{token}", [AuthController::class, "verifyEmail"]);
 
 Route::group(["prefix" => "auth"], function () {
-    Route::post("register", [AuthController::class, "register"]);
+    Route::post("register", [AuthController::class, "store"]);
     Route::post("login", [AuthController::class, "login"]);
 });
 
@@ -25,6 +24,7 @@ Route::group(["prefix" => "user"], function () {
         Route::get("profile", [AuthController::class, "profile"]);
         Route::put("update/profile", [AuthController::class, "updateProfile"]);
         Route::get("logout", [AuthController::class, "logout"]);
+        Route::put("reset/password", [AuthController::class, "passwordReset"]);
     });
 });
 
