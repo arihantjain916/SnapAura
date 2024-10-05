@@ -128,8 +128,8 @@ class AuthController extends Controller
             "name",
             "email",
         ]);
-        if ($request->hasFile('profile_image')) {
-            $data['profile_image'] = $this->uploadImage($request->file('profile_image'));
+        if ($request->hasFile('profile')) {
+            $data['profile'] = $this->uploadImage($request->file('profile'));
         }
 
         $isUpdate = $user->update(attributes: $data);
@@ -172,5 +172,5 @@ class AuthController extends Controller
         return $uploadedImageUrl;
     }
 
-    
+
 }
