@@ -6,6 +6,7 @@ use App\Models\User;
 use Auth;
 use Http;
 use Illuminate\Http\Request;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Storage;
 use Str;
 use App\Http\Requests\UpdateProfileRequest;
@@ -145,7 +146,20 @@ class AuthController extends Controller
             "status" => false,
             "message" => "Unable to update profile",
         ], 500);
+    }
 
+    public function logout()
+    {
+        $token = JWTAuth::getToken();
+
+        $invalidate = JWTAuth::invalidate($token);
+
+        if ($invalidate) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Logout successfully',
+            ], 200);
+        }
     }
 
     protected function sendEmail(object $user)
@@ -172,6 +186,4 @@ class AuthController extends Controller
 
         return $uploadedImageUrl;
     }
-
-
 }
