@@ -53,4 +53,34 @@ class PollController extends Controller
             ], 500);
         }
     }
+
+    public function storeUserVote($id, $option)
+    {
+        try {
+            $isPoolExist = Pool::where("id", $id)->first();
+            if (!$isPoolExist) {
+                return response()->json([
+                    "error" => "Poll not found",
+                    "success" => false
+                ], 404);
+            }
+
+            $options = json_decode($isPoolExist->options, true);
+            if (!in_array($option, $options)) {
+                return response()->json(['error' => 'Invalid option'], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'options' => json_decode($isPoolExist->options),
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                "error" => $e->getMessage(),
+                "success" => false
+            ], 500);
+        }
+    }
 }
