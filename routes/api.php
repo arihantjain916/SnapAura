@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CommentController;
 
 Route::get("/", function () {
     return response()->json([
@@ -32,12 +33,19 @@ Route::group(["prefix" => "user"], function () {
 Route::group(["prefix" => "post"], function () {
     Route::group(["middleware" => "auth:api"], function () {
         Route::post("/", [PostController::class, "store"]);
-        // Route::put("update/profile", [AuthController::class, "updateProfile"]);
-        // Route::get("logout", [AuthController::class, "logout"]);
-        // Route::put("reset/password", [AuthController::class, "passwordReset"]);
+        // Route::pos
     });
     Route::get("/", [PostController::class, "display"]);
     Route::get("/{id}", [PostController::class, "specificPost"]);
+});
+
+Route::group(["prefix" => "comment"], function () {
+    Route::group(["middleware" => "auth:api"], function () {
+        Route::post("/", [CommentController::class, "store"]);
+        Route::post("reply", [CommentController::class, "storeReply"]);
+
+    });
+    Route::get("/", [CommentController::class, "display"]);
 });
 
 
