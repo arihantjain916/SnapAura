@@ -11,7 +11,10 @@ class PostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        if (!auth()->check()) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -22,7 +25,19 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "image" => "required|image|mimes:jpeg,png,jpg,gif|max:2048",
+            "caption" => "required|string|max:255",
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            "image.required" => "An image is required",
+            "image.image" => "The image must be an image",
+            "image.mimes" => "The image must be a jpeg, png, jpg, or gif",
+            "image.max" => "The image must not be greater than 2MB",
+            "caption.required" => "Caption is required",
         ];
     }
 }
