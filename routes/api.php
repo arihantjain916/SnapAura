@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\PollController;
 
 Route::get("/", function () {
     return response()->json([
@@ -47,6 +48,15 @@ Route::group(["prefix" => "comment"], function () {
     });
     Route::get("/", [CommentController::class, "display"]);
 });
+
+Route::group(["prefix" => "pool"], function () {
+    Route::group(["middleware" => "auth:api"], function () {
+        Route::post("/", [PollController::class, "store"]);
+
+    });
+    Route::get("/", [PollController::class, "display"]);
+});
+
 
 
 
