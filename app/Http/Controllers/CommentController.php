@@ -65,8 +65,8 @@ class CommentController extends Controller
     {
         $comment = Comment::create([
             "comment" => $request->comment,
-            "user_id" => "1",
-            "parent_id" => "9d2c056a-b5b9-4ab7-95e3-b640e3815800"
+            "user_id" => auth()->user()->id,
+            "parent_id" => $request->parent_id
         ]);
 
         if (!$comment) {
