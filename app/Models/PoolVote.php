@@ -10,6 +10,11 @@ class PoolVote extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $fillable = [
+        "pool_id",
+        "option"
+    ];
+
     public static function boot()
     {
         parent::boot();
