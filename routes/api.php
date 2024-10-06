@@ -52,6 +52,7 @@ Route::group(["prefix" => "comment"], function () {
 Route::group(["prefix" => "pool"], function () {
     Route::group(["middleware" => "auth:api"], function () {
         Route::post("/", [PollController::class, "store"]);
+        Route::post("/vote/{id}/{option}", [PollController::class, "storeUserVote"]);
 
     });
     Route::get("/", [PollController::class, "display"]);
