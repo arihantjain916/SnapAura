@@ -25,4 +25,14 @@ class PoolVote extends Model
             'updated_at' => 'datetime:Y-m-d',
         ];
     }
+
+    public function pool()
+    {
+        return $this->belongsTo(Pool::class, 'pool_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
