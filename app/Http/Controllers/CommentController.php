@@ -30,4 +30,25 @@ class CommentController extends Controller
             ]
         ], 200);
     }
+
+    public function store(Request $request)
+    {
+        $comment = Comment::create([
+            'comment' => $request->comment,
+            'user_id' => "1",
+        ]);
+
+        if (!$comment) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong',
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Comment created successfully',
+            "data" => $comment
+        ], 200);
+    }
 }
