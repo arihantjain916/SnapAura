@@ -20,6 +20,24 @@ class PostController extends Controller
         ], 200);
     }
 
+    public function specificPost($id)
+    {
+        $post = Post::find($id);
+        // $res = fractal([$post], new PostTransformer())->toArray();
+
+        if (!$post) {
+            return response()->json([
+                "status" => "error",
+                "message" => "Post not found"
+            ], 404);
+        }
+
+        return response()->json([
+            "status" => "success",
+            "data" => $post
+        ], 200);
+    }
+
     public function store(PostRequest $request)
     {
         try {
