@@ -21,7 +21,7 @@ class PostDisplayTransform extends TransformerAbstract
             "created_at" => $data->created_at,
             "user" => [
                 "id" => $data->users->id,
-                "name" => $data->users->name,
+                "username" => $data->users->username,
                 "profile" => $data->users->profile,
             ]
 
