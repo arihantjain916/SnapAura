@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('pools', function (Blueprint $table) {
+        Schema::create('polls', function (Blueprint $table) {
             $table->uuid("id")->primary();
             $table->string("question");
             $table->json("options");

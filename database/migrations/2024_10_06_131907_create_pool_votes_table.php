@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('pool_votes', function (Blueprint $table) {
+        Schema::create('poll_votes', function (Blueprint $table) {
             $table->uuid("id")->primary();
             $table->foreignUuid("pool_id");
             $table->foreignUuid("user_id");
