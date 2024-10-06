@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\TagController;
+
 
 Route::get("/", function () {
     return response()->json([
@@ -32,11 +34,12 @@ Route::group(["prefix" => "user"], function () {
 
 Route::group(["prefix" => "post"], function () {
     Route::group(["middleware" => "auth:api"], function () {
-        Route::post("/", [PostController::class, "store"]);
+        Route::post("/posts", [PostController::class, "store"]);
         // Route::pos
     });
     Route::get("/", [PostController::class, "display"]);
     Route::get("/{id}", [PostController::class, "specificPost"]);
+
 });
 
 Route::group(["prefix" => "comment"], function () {
@@ -48,5 +51,9 @@ Route::group(["prefix" => "comment"], function () {
     Route::get("/", [CommentController::class, "display"]);
 });
 
-
-
+Route::group(["prefix" => "tag"], function () {
+    Route::group(["middleware" => "auth:api"], function () {
+        Route::get('{tagName}', [TagController::class, 'getPostsByTag']);
+        Route::get('/', [TagController::class, 'getAllTags']);
+    });
+});
