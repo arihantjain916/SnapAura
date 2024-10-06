@@ -14,7 +14,7 @@ class PostController extends Controller
         try {
             $data = [
                 "image" => $this->uploadImage($request->file('image')),
-                "title" => $request->title,
+                "caption" => $request->caption,
             ];
 
             DB::beginTransaction();

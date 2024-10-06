@@ -15,12 +15,19 @@ class Post extends Model
         "caption"
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->user_id = auth()->user()->id;
+        });
+    }
     protected function casts(): array
     {
         return [
             'created_at' => 'datetime:Y-m-d',
             'updated_at' => 'datetime:Y-m-d',
-            "user_id" => auth()->user()->id
         ];
     }
 
