@@ -13,7 +13,7 @@ class PollController extends Controller
         try {
             $data = [
                 "question" => $request->question,
-                "option" => $request->option,
+                "options" => json_encode($request->options),
             ];
 
             DB::beginTransaction();
