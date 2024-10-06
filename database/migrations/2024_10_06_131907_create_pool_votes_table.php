@@ -12,8 +12,8 @@ return new class extends Migration {
     {
         Schema::create('pool_votes', function (Blueprint $table) {
             $table->uuid("id")->primary();
-            $table->foreignUuid("pool");
-            $table->foreignUuid("user");
+            $table->foreignUuid("pool_id");
+            $table->foreignUuid("user_id");
             $table->string("option");
             $table->timestamps();
         });
