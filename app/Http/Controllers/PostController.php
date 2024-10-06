@@ -12,7 +12,10 @@ class PostController extends Controller
     public function display()
     {
         $post = Post::with('users')->get();
-        return response()->json($post);
+        return response()->json([
+            "status" => "success",
+            "data" => $post
+        ], 200);
     }
 
     public function store(PostRequest $request)
@@ -33,20 +36,20 @@ class PostController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Post not created',
-                ]);
+                ], 500);
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Post created successfully',
                 'data' => $post
-            ]);
+            ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 "success" => false,
                 "error" => $e->getMessage()
-            ]);
+            ], 500);
         }
     }
 
