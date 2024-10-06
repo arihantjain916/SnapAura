@@ -58,7 +58,7 @@ class PollController extends Controller
     public function storeUserVote($id, $option)
     {
         try {
-            $isPoolExist = Pool::where("id", $id)->first();
+            $isPoolExist = Pool::where("id", $id)->with('votes')->first();
             if (!$isPoolExist) {
                 return response()->json([
                     "error" => "Poll not found",
@@ -82,9 +82,20 @@ class PollController extends Controller
 
             DB::commit();
 
+            $totalVotes = $isPoolExist->votes->count();
+
+            $optionVotes = $isPoolExist->votes->groupBy('option')
+                ->map(fn($votes) => $votes->count());
+
+            $results = $optionVotes->map(function ($count) use ($totalVotes) {
+                return ($totalVotes > 0) ? round(($count / $totalVotes) * 100, 2) . " %" : 0;
+            });
+
             return response()->json([
                 'success' => true,
-                "message" => "Vote submitted successfully"
+                "message" => "Vote submitted successfully",
+                'results' => json_decode($results),
+                'totalVotes' => $totalVotes
             ]);
 
         } catch (\Exception $e) {
@@ -95,4 +106,5 @@ class PollController extends Controller
             ], 500);
         }
     }
+
 }
