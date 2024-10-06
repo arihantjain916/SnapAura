@@ -49,7 +49,7 @@ Route::group(["prefix" => "comment"], function () {
     Route::get("/", [CommentController::class, "display"]);
 });
 
-Route::group(["prefix" => "pool"], function () {
+Route::group(["prefix" => "poll"], function () {
     Route::group(["middleware" => "auth:api"], function () {
         Route::post("/", [PollController::class, "store"]);
         Route::post("/vote/{id}/{option}", [PollController::class, "storeUserVote"]);

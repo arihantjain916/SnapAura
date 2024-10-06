@@ -6,16 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-class Pool extends Model
+class PollVote extends Model
 {
     use HasFactory, HasUuids;
+
+    protected $fillable = [
+        "pool_id",
+        "option"
+    ];
 
     public static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
-            $model->created_by = auth()->user()->id;
+            $model->user_id = auth()->user()->id;
         });
     }
     protected function casts(): array
@@ -23,22 +28,16 @@ class Pool extends Model
         return [
             'created_at' => 'datetime:Y-m-d',
             'updated_at' => 'datetime:Y-m-d',
-            "option" => "array",
         ];
     }
 
-    protected $fillable = [
-        "question",
-        "options"
-    ];
-
-    public function votes()
+    public function pool()
     {
-        return $this->hasMany(PoolVote::class, 'pool_id');
+        return $this->belongsTo(Poll::class, 'pool_id');
     }
 
-    public function users()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
