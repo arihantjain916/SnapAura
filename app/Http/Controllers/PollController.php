@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PollRequest;
 use App\Models\Pool;
 use DB;
+use App\Transformers\PoolDisplayTransform;
 
 class PollController extends Controller
 {
@@ -13,7 +14,10 @@ class PollController extends Controller
     {
         $post = Pool::with(["users:id,username", "votes"])->get();
 
+        // $post = fractal([$post], new PoolDisplayTransform())->toArray();
+
         return response()->json([
+            "success" => true,
             "data" => $post
         ], 200);
     }
