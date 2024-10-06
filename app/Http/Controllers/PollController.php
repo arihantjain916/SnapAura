@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PollRequest;
 use App\Models\Pool;
+use App\Models\PoolVote;
 use DB;
 use App\Transformers\PoolDisplayTransform;
 
@@ -70,9 +71,20 @@ class PollController extends Controller
                 return response()->json(['error' => 'Invalid option'], 400);
             }
 
+            $data = [
+                "pool_id" => $id,
+                "option" => $option
+            ];
+
+            DB::beginTransaction();
+
+            PoolVote::create($data);
+
+            DB::commit();
+
             return response()->json([
                 'success' => true,
-                'options' => json_decode($isPoolExist->options),
+                "message" => "Vote submitted successfully"
             ]);
 
         } catch (\Exception $e) {
