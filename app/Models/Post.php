@@ -23,4 +23,9 @@ class Post extends Model
             "user_id" => auth()->user()->id
         ];
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, "user_id");
+    }
 }
