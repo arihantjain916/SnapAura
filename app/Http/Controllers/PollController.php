@@ -13,12 +13,19 @@ class PollController extends Controller
 
     public function display()
     {
-        $post = Pool::with(["users:id,username", "votes"])->get();
+        $post = Pool::with(["users:id,username", "votes.user:id,username"])->get();
+       
 
+        // return response()->json([
+        //     "success" => true,
+        //     "data" => $post
+        //     // "data" => $post["data"][0]["data"]
+        // ], 200);
         $post = fractal([$post], new PoolDisplayTransform())->toArray();
 
         return response()->json([
             "success" => true,
+            // "data" => $post
             "data" => $post["data"][0]["data"]
         ], 200);
     }
