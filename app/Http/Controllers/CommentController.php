@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Transformers\CommentTransform;
 use App\Models\Comment;
+use App\Http\Requests\CommentRequest;
 
 class CommentController extends Controller
 {
@@ -31,7 +32,7 @@ class CommentController extends Controller
         ], 200);
     }
 
-    public function store(Request $request)
+    public function store(CommentRequest $request)
     {
         $comment = Comment::create([
             'comment' => $request->comment,
