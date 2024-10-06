@@ -33,7 +33,7 @@ class PollVote extends Model
 
     public function pool()
     {
-        return $this->belongsTo(Pool::class, 'pool_id');
+        return $this->belongsTo(Poll::class, 'pool_id');
     }
 
     public function user()

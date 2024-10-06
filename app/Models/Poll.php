@@ -34,7 +34,7 @@ class Poll extends Model
 
     public function votes()
     {
-        return $this->hasMany(PoolVote::class, 'pool_id');
+        return $this->hasMany(PollVote::class, 'pool_id');
     }
 
     public function users()
