@@ -7,6 +7,7 @@ use App\Models\Post;
 use Storage;
 use DB;
 use App\Transformers\PostTransformer;
+use App\Transformers\PostDisplayTransform;
 
 class PostController extends Controller
 {
@@ -22,8 +23,9 @@ class PostController extends Controller
 
     public function specificPost($id)
     {
-        $post = Post::find($id);
-        // $res = fractal([$post], new PostTransformer())->toArray();
+        $post = Post::with('users')->find($id);
+
+        $res = fractal($post, new PostDisplayTransform())->toArray();
 
         if (!$post) {
             return response()->json([
@@ -34,7 +36,7 @@ class PostController extends Controller
 
         return response()->json([
             "status" => "success",
-            "data" => $post
+            "data" => $res["data"]
         ], 200);
     }
 
