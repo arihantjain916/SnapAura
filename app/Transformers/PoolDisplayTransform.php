@@ -21,6 +21,7 @@ class PoolDisplayTransform extends TransformerAbstract
                 "question" => $item->question,
                 "options" => json_decode($item->options),
                 "created_at" => $item->created_at,
+                "votes" => $this->voteTransform($item->votes),
                 "user" => [
                     "id" => $item->users->id,
                     "username" => $item->users->username,
@@ -30,5 +31,22 @@ class PoolDisplayTransform extends TransformerAbstract
         return [
             "data" => $res
         ];
+    }
+
+    protected function voteTransform($vote)
+    {
+        $data = [];
+
+        foreach ($vote as $item) {
+            $data[] = [
+                "id" => $item->id,
+                "user_id" => $item->user_id,
+                "option" => $item->option,
+                "created_at" => $item->created_at,
+                "voted_by" => $item->user,
+            ];
+        }
+
+        return $data;
     }
 }
