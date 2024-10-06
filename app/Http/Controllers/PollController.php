@@ -14,11 +14,11 @@ class PollController extends Controller
     {
         $post = Pool::with(["users:id,username", "votes"])->get();
 
-        // $post = fractal([$post], new PoolDisplayTransform())->toArray();
+        $post = fractal([$post], new PoolDisplayTransform())->toArray();
 
         return response()->json([
             "success" => true,
-            "data" => $post
+            "data" => $post["data"][0]["data"]
         ], 200);
     }
 
