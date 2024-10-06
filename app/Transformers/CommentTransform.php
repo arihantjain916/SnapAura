@@ -4,7 +4,7 @@ namespace App\Transformers;
 
 use League\Fractal\TransformerAbstract;
 
-class CommentRequest extends TransformerAbstract
+class CommentTransform extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
