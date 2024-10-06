@@ -36,6 +36,7 @@ Route::group(["prefix" => "post"], function () {
         // Route::get("logout", [AuthController::class, "logout"]);
         // Route::put("reset/password", [AuthController::class, "passwordReset"]);
     });
+    Route::get("/", [PostController::class, "display"]);
 });
 
 
