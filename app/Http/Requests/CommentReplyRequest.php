@@ -27,6 +27,7 @@ class CommentReplyRequest extends FormRequest
         return [
             "comment" => "required|string|max:255",
             "parent_id" => "required|exists:comments,id",
+            "post_id" => "required|exists:posts,id",
         ];
     }
 
@@ -38,6 +39,9 @@ class CommentReplyRequest extends FormRequest
             "comment.max" => "Comment must be less than 255 characters",
             "parent_id.required" => "Parent ID is required",
             "parent_id.exists" => "Parent ID must exist in the comments table",
+            "post_id"=> "Post ID must exist in the posts table",
+            "post_id.exists" => "Post ID must exist in the posts table",
+            "post_id.required"=> "Post ID is required",
         ];
     }
 }

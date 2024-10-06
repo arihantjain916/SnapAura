@@ -42,6 +42,8 @@ Route::group(["prefix" => "post"], function () {
 Route::group(["prefix" => "comment"], function () {
     Route::group(["middleware" => "auth:api"], function () {
         Route::post("/", [CommentController::class, "store"]);
+        Route::post("reply", [CommentController::class, "storeReply"]);
+
     });
     Route::get("/", [CommentController::class, "display"]);
 });
