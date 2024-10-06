@@ -6,15 +6,17 @@ use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use Storage;
 use DB;
+use App\Transformers\PostTransformer;
 
 class PostController extends Controller
 {
     public function display()
     {
         $post = Post::with('users')->get();
+        $res = fractal([$post], new PostTransformer())->toArray();
         return response()->json([
             "status" => "success",
-            "data" => $post
+            "data" => $res['data'][0][0]
         ], 200);
     }
 
