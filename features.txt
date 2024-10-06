@@ -6,5 +6,5 @@ Features:
 4. Tag on post (again like we see on Instagram, LinkedIn)
 5. Story management (like send in archive after 24 hrs)
 6. User tag and collaboration 
-7. pool or ask question to users
+7. pool or ask question to users ✅
 8. Personal Message and Group Message (in last)
