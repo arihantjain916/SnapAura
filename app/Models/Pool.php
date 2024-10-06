@@ -15,7 +15,7 @@ class Pool extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $model->user_id = auth()->user()->id;
+            $model->created_by = auth()->user()->id;
         });
     }
     protected function casts(): array
@@ -29,7 +29,7 @@ class Pool extends Model
 
     protected $fillable = [
         "question",
-        "option"
+        "options"
     ];
 
     public function votes()
