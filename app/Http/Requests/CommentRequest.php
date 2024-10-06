@@ -25,7 +25,19 @@ class CommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "comment" => "required|string|max:255",
+            "post_id" => "required|exists:posts,id",
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            "comment.required" => "Comment is required",
+            "comment.string" => "Comment must be a string",
+            "comment.max" => "Comment must be less than 255 characters",
+            "post_id.required" => "Post id is required",
+            "post_id.exists" => "Post id does not exist",
         ];
     }
 }
