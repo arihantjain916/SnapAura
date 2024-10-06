@@ -9,6 +9,12 @@ use DB;
 
 class PostController extends Controller
 {
+    public function display()
+    {
+        $post = Post::with('users')->get();
+        return response()->json($post);
+    }
+
     public function store(PostRequest $request)
     {
         try {
