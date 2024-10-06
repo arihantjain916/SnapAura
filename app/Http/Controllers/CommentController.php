@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Transformers\CommentTransform;
 use App\Models\Comment;
 use App\Http\Requests\CommentRequest;
+use App\Http\Requests\CommentReplyRequest;
 
 class CommentController extends Controller
 {
@@ -57,6 +58,28 @@ class CommentController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Comment created successfully',
+        ], 200);
+    }
+
+    public function storeReply(CommentReplyRequest $request)
+    {
+        $comment = Comment::create([
+            "comment" => $request->comment,
+            "user_id" => "1",
+            "parent_id" => "9d2c056a-b5b9-4ab7-95e3-b640e3815800"
+        ]);
+
+        if (!$comment) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong',
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Comment created successfully',
+            "data" => $comment
         ], 200);
     }
 }
