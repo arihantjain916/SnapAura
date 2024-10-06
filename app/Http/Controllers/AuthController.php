@@ -19,6 +19,7 @@ class AuthController extends Controller
     public function store(RegisterRequest $request)
     {
         $data = [
+            "username" => $request->username,
             "email" => $request->email,
             "password" => $request->password,
             "name" => $request->name
