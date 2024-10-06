@@ -19,6 +19,13 @@ class CommentController extends Controller
         $previousPageUrl = $comments->previousPageUrl();
         $count = $comments->count();
 
+        if (count($comments) == 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No comments found'
+            ]);
+        }
+
         $comments = fractal([$comments], new CommentTransform())->toArray();
 
         return response()->json([
@@ -50,7 +57,6 @@ class CommentController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Comment created successfully',
-            "data" => $comment
         ], 200);
     }
 }
