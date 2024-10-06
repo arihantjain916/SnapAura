@@ -8,6 +8,16 @@ use DB;
 
 class PollController extends Controller
 {
+
+    public function display()
+    {
+        $post = Pool::with(["users:id,username", "votes"])->get();
+
+        return response()->json([
+            "data" => $post
+        ], 200);
+    }
+
     public function store(PollRequest $request)
     {
         try {
