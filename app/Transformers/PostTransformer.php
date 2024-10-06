@@ -23,7 +23,7 @@ class PostTransformer extends TransformerAbstract
                 "created_at" => $value->created_at,
                 "user" => [
                     "id" => $value->users->id,
-                    "name" => $value->users->name,
+                    "username" => $value->users->username,
                     "profile" => $value->users->profile,
                 ]
             ];
