@@ -4,7 +4,7 @@ namespace App\Transformers;
 
 use League\Fractal\TransformerAbstract;
 
-class PoolDisplayTransform extends TransformerAbstract
+class PollDisplayTransform extends TransformerAbstract
 {
 
     /**

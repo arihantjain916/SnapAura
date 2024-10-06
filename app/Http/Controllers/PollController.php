@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PollRequest;
-use App\Models\Pool;
-use App\Models\PoolVote;
+use App\Models\Poll;
+use App\Models\PollVote;
 use DB;
-use App\Transformers\PoolDisplayTransform;
+use App\Transformers\PollDisplayTransform;
 
 class PollController extends Controller
 {
 
     public function display()
     {
-        $post = Pool::with(["users:id,username", "votes.user:id,username"])->get();
+        $post = Poll::with(["users:id,username", "votes.user:id,username"])->get();
        
-        $post = fractal([$post], new PoolDisplayTransform())->toArray();
+        $post = fractal([$post], new PollDisplayTransform())->toArray();
 
         return response()->json([
             "success" => true,
@@ -33,7 +33,7 @@ class PollController extends Controller
 
             DB::beginTransaction();
 
-            $pool = Pool::create($data);
+            $pool = Poll::create($data);
             DB::commit();
 
             if (!$pool) {
@@ -58,7 +58,7 @@ class PollController extends Controller
     public function storeUserVote($id, $option)
     {
         try {
-            $isPoolExist = Pool::where("id", $id)->with('votes')->first();
+            $isPoolExist = Poll::where("id", $id)->with('votes')->first();
             if (!$isPoolExist) {
                 return response()->json([
                     "error" => "Poll not found",
@@ -78,7 +78,7 @@ class PollController extends Controller
 
             DB::beginTransaction();
 
-            PoolVote::create($data);
+            PollVote::create($data);
 
             DB::commit();
 

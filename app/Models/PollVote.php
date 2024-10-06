@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-class PoolVote extends Model
+class PollVote extends Model
 {
     use HasFactory, HasUuids;
 
