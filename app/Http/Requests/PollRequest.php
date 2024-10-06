@@ -11,7 +11,10 @@ class PollRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        if (!auth()->check()) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -22,7 +25,16 @@ class PollRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "question" => "required",
+            "options.*" => "required",
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            "question.required" => "Question is required",
+            "options.*.required" => "Option is required",
         ];
     }
 }
