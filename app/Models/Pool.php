@@ -36,4 +36,9 @@ class Pool extends Model
     {
         return $this->hasMany(PoolVote::class, 'pool_id');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_id');
+    }
 }
