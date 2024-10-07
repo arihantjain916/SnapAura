@@ -9,6 +9,8 @@ use DB;
 use App\Transformers\PostTransformer;
 use App\Transformers\PostDisplayTransform;
 use App\Models\Tag;
+use App\Transformers\PostStoreTransform;
+
 class PostController extends Controller
 {
     public function display()
@@ -69,7 +71,7 @@ class PostController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Post created successfully',
-                'data' => $post->load('tags'),
+                'data' => $post,
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
