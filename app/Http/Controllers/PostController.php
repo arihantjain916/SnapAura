@@ -106,8 +106,7 @@ class PostController extends Controller
             $hashtagIds[] = $hashtag->id;
         }
 
-        // Attach the hashtags to the post
-        $post->hashtags()->sync($hashtagIds);
+        $post->tags()->sync($hashtagIds);
     }
 
 }
