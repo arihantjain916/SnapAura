@@ -62,6 +62,8 @@ class PostController extends Controller
 
             $hashtags = $this->extractHashtags($request->caption);
 
+            $this->syncHashtags($post, $hashtags);
+
             DB::commit();
 
             return response()->json([
@@ -93,6 +95,19 @@ class PostController extends Controller
     {
         preg_match_all('/#(\w+)/', $content, $matches);
         return $matches[1];
+    }
+
+    private function syncHashtags(Post $post, array $hashtags)
+    {
+        $hashtagIds = [];
+
+        foreach ($hashtags as $tag) {
+            $hashtag = Tag::firstOrCreate(['name' => '#' . $tag]);
+            $hashtagIds[] = $hashtag->id;
+        }
+
+        // Attach the hashtags to the post
+        $post->hashtags()->sync($hashtagIds);
     }
 
 }
