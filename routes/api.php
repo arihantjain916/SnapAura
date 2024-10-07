@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\PollController;
 
 Route::get("/", function () {
@@ -38,6 +39,7 @@ Route::group(["prefix" => "post"], function () {
     });
     Route::get("/", [PostController::class, "display"]);
     Route::get("/{id}", [PostController::class, "specificPost"]);
+
 });
 
 Route::group(["prefix" => "comment"], function () {
@@ -59,5 +61,9 @@ Route::group(["prefix" => "poll"], function () {
 });
 
 
-
-
+Route::group(["prefix" => "tag"], function () {
+    Route::group(["middleware" => "auth:api"], function () {
+        Route::get('{tagName}', [TagController::class, 'getPostsByTag']);
+        Route::get('/', [TagController::class, 'getAllTags']);
+    });
+});

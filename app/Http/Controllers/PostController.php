@@ -8,6 +8,8 @@ use Storage;
 use DB;
 use App\Transformers\PostTransformer;
 use App\Transformers\PostDisplayTransform;
+use App\Models\Tag;
+use App\Transformers\PostStoreTransform;
 
 class PostController extends Controller
 {
@@ -46,13 +48,12 @@ class PostController extends Controller
             $data = [
                 "image" => $this->uploadImage($request->file('image')),
                 "caption" => $request->caption,
+
             ];
 
             DB::beginTransaction();
 
             $post = Post::create($data);
-
-            DB::commit();
 
             if (!$post) {
                 return response()->json([
@@ -61,10 +62,16 @@ class PostController extends Controller
                 ], 500);
             }
 
+            $hashtags = $this->extractHashtags($request->caption);
+
+            $this->syncHashtags($post, $hashtags);
+
+            DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Post created successfully',
-                'data' => $post
+                'data' => $post,
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -75,6 +82,7 @@ class PostController extends Controller
         }
     }
 
+
     protected function uploadImage($file)
     {
         $uploadFolder = 'posts';
@@ -84,4 +92,23 @@ class PostController extends Controller
 
         return $uploadedImageUrl;
     }
+
+    private function extractHashtags($content)
+    {
+        preg_match_all('/#(\w+)/', $content, $matches);
+        return $matches[1];
+    }
+
+    private function syncHashtags(Post $post, array $hashtags)
+    {
+        $hashtagIds = [];
+
+        foreach ($hashtags as $tag) {
+            $hashtag = Tag::firstOrCreate(['name' => '#' . $tag]);
+            $hashtagIds[] = $hashtag->id;
+        }
+
+        $post->tags()->sync($hashtagIds);
+    }
+
 }

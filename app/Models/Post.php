@@ -12,7 +12,7 @@ class Post extends Model
 
     protected $fillable = [
         "image",
-        "caption"
+        "caption",
     ];
 
     public static function boot()
@@ -31,8 +31,8 @@ class Post extends Model
         ];
     }
 
-    public function users()
+    public function tags()
     {
-        return $this->belongsTo(User::class,'user_id');
+        return $this->belongsToMany(Tag::class, 'post_tag', 'post_id', 'tag_id');
     }
 }
