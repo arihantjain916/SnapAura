@@ -60,16 +60,7 @@ class PostController extends Controller
                 ], 500);
             }
 
-            if ($request->has('tags')) {
-                $tagIds = collect($request->tags)->map(function ($tagName) {
-                    if (substr($tagName, 0, 1) !== '#') {
-                        $tagName = '#' . $tagName;
-                    }
-                    return Tag::firstOrCreate(['name' => $tagName])->id;
-                });
-
-                $post->tags()->sync($tagIds);
-            }
+            $hashtags = $this->extractHashtags($request->caption);
 
             DB::commit();
 
@@ -78,8 +69,7 @@ class PostController extends Controller
                 'message' => 'Post created successfully',
                 'data' => $post->load('tags'),
             ], 201);
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 "success" => false,
@@ -98,4 +88,11 @@ class PostController extends Controller
 
         return $uploadedImageUrl;
     }
+
+    private function extractHashtags($content)
+    {
+        preg_match_all('/#(\w+)/', $content, $matches);
+        return $matches[1];
+    }
+
 }
