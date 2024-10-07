@@ -8,7 +8,7 @@ use Storage;
 use DB;
 use App\Transformers\PostTransformer;
 use App\Transformers\PostDisplayTransform;
-
+use App\Models\Tag;
 class PostController extends Controller
 {
     public function display()
@@ -46,13 +46,12 @@ class PostController extends Controller
             $data = [
                 "image" => $this->uploadImage($request->file('image')),
                 "caption" => $request->caption,
+
             ];
 
             DB::beginTransaction();
 
             $post = Post::create($data);
-
-            DB::commit();
 
             if (!$post) {
                 return response()->json([
@@ -61,12 +60,26 @@ class PostController extends Controller
                 ], 500);
             }
 
+            if ($request->has('tags')) {
+                $tagIds = collect($request->tags)->map(function ($tagName) {
+                    if (substr($tagName, 0, 1) !== '#') {
+                        $tagName = '#' . $tagName;
+                    }
+                    return Tag::firstOrCreate(['name' => $tagName])->id;
+                });
+
+                $post->tags()->sync($tagIds);
+            }
+
+            DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Post created successfully',
-                'data' => $post
+                'data' => $post->load('tags'),
             ], 201);
-        } catch (\Exception $e) {
+        } 
+        catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 "success" => false,
@@ -74,6 +87,7 @@ class PostController extends Controller
             ], 500);
         }
     }
+
 
     protected function uploadImage($file)
     {
