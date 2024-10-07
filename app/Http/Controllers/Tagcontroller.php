@@ -10,11 +10,11 @@ class Tagcontroller extends Controller
     public function getPostsByTag($tagName)
     {
         try {
-            $decodedTagName = urldecode($tagName);
-            DB::enableQueryLog();
 
-            $tag = Tag::where('name', $decodedTagName)->first();
-            \Log::info(DB::getQueryLog());
+            // dd($tagName);
+
+            $tag = Tag::where('name', "#".$tagName)->first();
+
             if (!$tag) {
                 return response()->json([
                     'success' => false,
@@ -23,13 +23,14 @@ class Tagcontroller extends Controller
             }
 
             $posts = $tag->posts()->get();
-            \Log::info('Fetched posts:', $posts->toArray());
-           
 
+            $posts->makeHidden(['pivot']);
+           
             return response()->json([
                 'success' => true,
                 'data' => $posts
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
