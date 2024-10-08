@@ -15,7 +15,6 @@ return new class extends Migration
             
             $table->foreignUuid('post_id')->constrained()->onDelete('cascade');
             $table->foreignUuid('tag_id')->constrained()->onDelete('cascade');
-            $table->primary(['post_id', 'tag_id']);
             $table->timestamps();
         });
     }
