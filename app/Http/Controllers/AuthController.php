@@ -43,12 +43,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $user = User::where('email', $request->email)->first();
-        if (!$user->email_verified_at) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Email not verified',
-            ]);
-        }
+        // dd($user);
 
         $credentials = $request->only('email', 'password');
         $token = Auth::attempt($credentials);
@@ -57,6 +52,13 @@ class AuthController extends Controller
                 'status' => 'error',
                 'message' => 'Email or password invalid',
             ], 401);
+        }
+
+        if (!$user->email_verified_at) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email not verified',
+            ]);
         }
 
         return response()->json([
