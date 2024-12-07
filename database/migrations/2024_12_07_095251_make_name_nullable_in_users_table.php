@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('post_tag', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('post_id')->constrained("posts")->onDelete('cascade');
-            $table->foreignUuid('tag_id')->constrained("tags")->onDelete('cascade');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->string("name")->nullable()->change();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('post_tag');
+        Schema::table('users', function (Blueprint $table) {
+            $table->string("name")->change();
+        });
     }
 };
