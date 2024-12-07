@@ -25,12 +25,21 @@ class AuthController extends Controller
         ];
         $register = User::create($data);
 
+        $token = Auth::attempt($register);
+        if (!$token) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error Generating token',
+            ], 401);
+        }
+
         if ($register) {
             $this->sendEmail($register);
             return response()->json([
                 'success' => true,
                 'message' => 'User created successfully',
-                'data' => $register
+                'data' => $register,
+                'token' => $token
             ]);
         }
         return response()->json([
@@ -42,7 +51,6 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $user = User::where('email', $request->email)->first();
-        // dd($user);
 
         $credentials = $request->only('email', 'password');
         $token = Auth::attempt($credentials);
@@ -63,6 +71,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'token' => $token,
+            "data" => $user
         ]);
     }
 
