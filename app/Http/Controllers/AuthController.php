@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EmailVerification;
 use App\Models\User;
 use Auth;
 use Http;
 use Illuminate\Http\Request;
+use Mail;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Storage;
 use Str;
@@ -25,7 +27,18 @@ class AuthController extends Controller
         ];
         $register = User::create($data);
 
-        $token = Auth::attempt($register);
+        if (!$register) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not created',
+            ]);
+        }
+
+
+        $this->sendEmail($register);
+        $credentials = $request->only('email', 'password');
+
+        $token = Auth::attempt($credentials);
         if (!$token) {
             return response()->json([
                 'status' => 'error',
@@ -33,18 +46,11 @@ class AuthController extends Controller
             ], 401);
         }
 
-        if ($register) {
-            $this->sendEmail($register);
-            return response()->json([
-                'success' => true,
-                'message' => 'User created successfully',
-                'data' => $register,
-                'token' => $token
-            ]);
-        }
         return response()->json([
-            'success' => false,
-            'message' => 'User not created',
+            'success' => true,
+            'message' => 'User created successfully',
+            'data' => $register,
+            'token' => $token
         ]);
     }
 
@@ -190,12 +196,13 @@ class AuthController extends Controller
         $url = "$app_url/api/verify/email/$user->id/$token";
         $data = [
             "email" => $user->email,
-            "body" => "<a>$url</a>"
+            "link" => $url,
+            "username" => $user->username
         ];
         $user->update([
             'remember_token' => $token
         ]);
-        Http::post("https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjYwNTZkMDYzMjA0M2M1MjY4NTUzZDUxMzQi_pc", $data);
+        Mail::to($user->email)->send(new EmailVerification($data));
     }
 
     protected function uploadImage($file)
