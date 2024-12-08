@@ -74,7 +74,7 @@
                 </div>
             </div>
             <main style="margin-top: 2rem; padding-left: 1.25rem; padding-right: 1.25rem;">
-                <h4 style="color: #374151;">Hello {{$data["name"]}},</h4>
+                <h4 style="color: #374151;">Hello {{$data["username"]}},</h4>
                 <p style="line-height: 1.5; color: #4b5563;">
                     Please use the following One Time Password(OTP)
                 </p>

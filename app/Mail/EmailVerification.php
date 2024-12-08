@@ -17,7 +17,7 @@ class EmailVerification extends Mailable
      * Create a new message instance.
      */
     public $data;
-    public function __construct($data)
+    public function __construct(array $data)
     {
         $this->data = $data;
     }
