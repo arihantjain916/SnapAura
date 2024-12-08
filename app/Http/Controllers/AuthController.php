@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\EmailVerification;
 use App\Models\User;
 use Auth;
+use DB;
 use Http;
 use Illuminate\Http\Request;
 use Mail;
@@ -152,27 +153,38 @@ class AuthController extends Controller
 
     public function updateProfile(UpdateProfileRequest $request)
     {
-        $user = User::find(auth()->user()->id);
-        $data = $request->only([
-            "name",
-            "email",
-        ]);
-        if ($request->hasFile('profile')) {
-            $data['profile'] = $this->uploadImage($request->file('profile'));
-        }
+        try {
+            $user = User::find(auth()->user()->id);
+            $data = $request->only([
+                "username",
+                "email",
+                "name"
+            ]);
 
-        $isUpdate = $user->update(attributes: $data);
-        if ($isUpdate) {
+            if ($request->hasFile('profile')) {
+                $data['profile'] = $this->uploadImage($request->file('profile'));
+            }
+            DB::beginTransaction();
+            $isUpdate = $user->update($data);
+            DB::commit();
+
+            if ($isUpdate) {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Profile updated successfully",
+                    "data" => $user->fresh(),
+                ], 200);
+            }
             return response()->json([
-                "status" => true,
-                "message" => "Profile updated successfully",
-                "data" => $user->fresh(),
-            ], 200);
+                "status" => false,
+                "message" => "Unable to update profile",
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+            ], 500);
         }
-        return response()->json([
-            "status" => false,
-            "message" => "Unable to update profile",
-        ], 500);
     }
 
     public function logout()
