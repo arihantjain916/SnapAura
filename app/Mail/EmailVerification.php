@@ -16,9 +16,10 @@ class EmailVerification extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public $data;
+    public function __construct($data)
     {
-        //
+        $this->data = $data;
     }
 
     /**
@@ -37,7 +38,8 @@ class EmailVerification extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'mail.emailverification',
+            with: $this->data
         );
     }
 
