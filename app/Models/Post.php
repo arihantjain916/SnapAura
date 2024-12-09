@@ -35,4 +35,14 @@ class Post extends Model
     {
         return $this->belongsToMany(Tag::class, 'post_tag', 'post_id', 'tag_id');
     }
+
+    public function users()
+    {
+        return $this->belongsTo(User::class, "user_id");
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'post', 'id');
+    }
+
 }

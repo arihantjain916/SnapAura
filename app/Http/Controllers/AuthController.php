@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EmailVerification;
 use App\Models\User;
 use Auth;
+use DB;
 use Http;
 use Illuminate\Http\Request;
+use Mail;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Storage;
 use Str;
@@ -25,7 +28,18 @@ class AuthController extends Controller
         ];
         $register = User::create($data);
 
-        $token = Auth::attempt($register);
+        if (!$register) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not created',
+            ]);
+        }
+
+
+        $this->sendEmail($register);
+        $credentials = $request->only('email', 'password');
+
+        $token = Auth::attempt($credentials);
         if (!$token) {
             return response()->json([
                 'status' => 'error',
@@ -33,18 +47,11 @@ class AuthController extends Controller
             ], 401);
         }
 
-        if ($register) {
-            $this->sendEmail($register);
-            return response()->json([
-                'success' => true,
-                'message' => 'User created successfully',
-                'data' => $register,
-                'token' => $token
-            ]);
-        }
         return response()->json([
-            'success' => false,
-            'message' => 'User not created',
+            'success' => true,
+            'message' => 'User created successfully',
+            'data' => $register,
+            'token' => $token
         ]);
     }
 
@@ -146,27 +153,38 @@ class AuthController extends Controller
 
     public function updateProfile(UpdateProfileRequest $request)
     {
-        $user = User::find(auth()->user()->id);
-        $data = $request->only([
-            "name",
-            "email",
-        ]);
-        if ($request->hasFile('profile')) {
-            $data['profile'] = $this->uploadImage($request->file('profile'));
-        }
+        try {
+            $user = User::find(auth()->user()->id);
+            $data = $request->only([
+                "username",
+                "email",
+                "name"
+            ]);
 
-        $isUpdate = $user->update(attributes: $data);
-        if ($isUpdate) {
+            if ($request->hasFile('profile')) {
+                $data['profile'] = $this->uploadImage($request->file('profile'));
+            }
+            DB::beginTransaction();
+            $isUpdate = $user->update($data);
+            DB::commit();
+
+            if ($isUpdate) {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Profile updated successfully",
+                    "data" => $user->fresh(),
+                ], 200);
+            }
             return response()->json([
-                "status" => true,
-                "message" => "Profile updated successfully",
-                "data" => $user->fresh(),
-            ], 200);
+                "status" => false,
+                "message" => "Unable to update profile",
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+            ], 500);
         }
-        return response()->json([
-            "status" => false,
-            "message" => "Unable to update profile",
-        ], 500);
     }
 
     public function logout()
@@ -190,12 +208,13 @@ class AuthController extends Controller
         $url = "$app_url/api/verify/email/$user->id/$token";
         $data = [
             "email" => $user->email,
-            "body" => "<a>$url</a>"
+            "link" => $url,
+            "username" => $user->username
         ];
         $user->update([
             'remember_token' => $token
         ]);
-        Http::post("https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjYwNTZkMDYzMjA0M2M1MjY4NTUzZDUxMzQi_pc", $data);
+        Mail::to($user->email)->send(new EmailVerification($data));
     }
 
     protected function uploadImage($file)
