@@ -15,7 +15,7 @@ class PostController extends Controller
 {
     public function display()
     {
-        $post = Post::with('users')->get();
+        $post = Post::with(['users','comments.user'])->get();
         $res = fractal([$post], new PostTransformer())->toArray();
         return response()->json([
             "status" => "success",

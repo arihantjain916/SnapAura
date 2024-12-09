@@ -25,11 +25,35 @@ class PostTransformer extends TransformerAbstract
                     "id" => $value->users->id,
                     "username" => $value->users->username,
                     "profile" => $value->users->profile,
-                ]
+                ],
+                // "comments" => [
+                //     "comment" => $value->comments->comment,
+                //     "user" => [
+                //         "id" => $value->comments->user->id,
+                //         "username" => $value->comments->user->username,
+                //         "profile" => $value->comments->user->profile,
+                //     ],
+                // ]
+                "comments" => $this->commentData($value->comments)
             ];
         }
         return [
             $constData
         ];
+    }
+    public function commentData($data)
+    {
+        $comment = [];
+        foreach ($data as $value) {
+            $comment[] = [
+                "comment" => $value->comment,
+                "user" => [
+                    "id" => $value->user->id,
+                    "username" => $value->user->username,
+                    "profile" => $value->user->profile,
+                ],
+            ];
+        }
+        return $comment;
     }
 }
