@@ -203,9 +203,10 @@ class AuthController extends Controller
 
     protected function sendEmail(object $user)
     {
-        $app_url = env("APP_URL");
+        // $app_url = "localhost:3000";
+        $app_url = "https://snap-aura.vercel.app";
         $token = Str::random(20);
-        $url = "$app_url/api/verify/email/$user->id/$token";
+        $url = "$app_url/auth/account-verify/$token/$user->id";
         $data = [
             "email" => $user->email,
             "link" => $url,
