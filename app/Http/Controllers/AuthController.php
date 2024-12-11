@@ -32,7 +32,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'User not created',
-            ]);
+            ], 400);
         }
 
 
@@ -52,7 +52,7 @@ class AuthController extends Controller
             'message' => 'User created successfully',
             'data' => $register,
             'token' => $token
-        ]);
+        ], 200);
     }
 
     public function login(LoginRequest $request)
@@ -72,14 +72,14 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Email not verified',
-            ]);
+            ], 500);
         }
 
         return response()->json([
             'status' => 'success',
             'token' => $token,
             "data" => $user
-        ]);
+        ], 200);
     }
 
     public function profile()
@@ -199,6 +199,22 @@ class AuthController extends Controller
                 'message' => 'Logout successfully',
             ], 200);
         }
+    }
+
+    public function resendEmail($email)
+    {
+        $user = User::where('email', $email)->first();
+        if ($user) {
+            $this->sendEmail($user);
+            return response()->json([
+                'success' => true,
+                'message' => 'Email sent successfully',
+            ], 200);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found',
+        ], 500);
     }
 
     protected function sendEmail(object $user)
