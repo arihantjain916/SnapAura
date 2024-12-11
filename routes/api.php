@@ -17,6 +17,7 @@ Route::get("/", function () {
 
 
 Route::get("verify/email/{userId}/{token}", [AuthController::class, "verifyEmail"]);
+Route::get("resend-email/{email}", [AuthController::class, "resendEmail"]);
 
 Route::group(["prefix" => "auth"], function () {
     Route::post("register", [AuthController::class, "store"]);
