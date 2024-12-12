@@ -10,12 +10,13 @@ use App\Transformers\PostTransformer;
 use App\Transformers\PostDisplayTransform;
 use App\Models\Tag;
 use App\Transformers\PostStoreTransform;
+use Str;
 
 class PostController extends Controller
 {
     public function display()
     {
-        $post = Post::with(['users','comments.user'])->get();
+        $post = Post::with(['users', 'comments.user'])->get();
         $res = fractal([$post], new PostTransformer())->toArray();
         return response()->json([
             "status" => "success",
@@ -104,11 +105,14 @@ class PostController extends Controller
         $hashtagIds = [];
 
         foreach ($hashtags as $tag) {
-            $hashtag = Tag::firstOrCreate(['name' => '#' . $tag]);
+            $hashtag = Tag::firstOrCreate(['name' => '#' . $tag, 'user_id' => auth()->user()->id]);
             $hashtagIds[] = $hashtag->id;
         }
 
-        $post->tags()->sync($hashtagIds);
+        $post->tags()->sync(
+            collect($hashtagIds)->mapWithKeys(fn($id) => [$id => ['id' => Str::uuid()]])->toArray()
+        );
+        
     }
 
 }
