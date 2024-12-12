@@ -16,7 +16,7 @@ class PostController extends Controller
 {
     public function display()
     {
-        $post = Post::with(['users', 'comments.user'])->get();
+        $post = Post::with(['users', 'comments.user'])->orderBy("created_at", 'desc')->get();
         $res = fractal([$post], new PostTransformer())->toArray();
         return response()->json([
             "status" => "success",
@@ -112,7 +112,7 @@ class PostController extends Controller
         $post->tags()->sync(
             collect($hashtagIds)->mapWithKeys(fn($id) => [$id => ['id' => Str::uuid()]])->toArray()
         );
-        
+
     }
 
 }
