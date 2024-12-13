@@ -38,7 +38,6 @@ Route::group(["prefix" => "post"], function () {
     Route::group(["middleware" => "auth:api"], function () {
         Route::post("/", [PostController::class, "store"]);
         Route::post("/like/{post_id}", [LikeController::class, 'like']);
-        Route::post("/unlike/{post_id}", [LikeController::class, 'unlike']);
     });
     Route::get("/", [PostController::class, "display"]);
     Route::get("/{id}", [PostController::class, "specificPost"]);

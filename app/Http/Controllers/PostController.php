@@ -18,6 +18,13 @@ class PostController extends Controller
     public function display()
     {
         $post = Post::with(['users', 'comments.user', 'likes'])->orderBy("created_at", 'desc')->get();
+
+        if (auth()->user()) {
+            $userId = auth()->user()->id;
+            $post->each(function ($post) use ($userId) {
+                $post->isLiked = (bool) $post->likes->contains('user_id', $userId);
+            });
+        }
         $res = fractal([$post], new PostTransformer())->toArray();
         return response()->json([
             "status" => "success",
@@ -83,7 +90,6 @@ class PostController extends Controller
             ], 500);
         }
     }
-
 
     protected function uploadImage($file)
     {

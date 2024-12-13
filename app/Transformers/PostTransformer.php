@@ -28,6 +28,7 @@ class PostTransformer extends TransformerAbstract
                 ],
                 "comments" => $this->commentData($value->comments),
                 "totalLikes" => $value->likes->count(),
+                'isLiked' => (bool) $value->isLiked
             ];
         }
         return [
