@@ -26,15 +26,9 @@ class PostTransformer extends TransformerAbstract
                     "username" => $value->users->username,
                     "profile" => $value->users->profile,
                 ],
-                // "comments" => [
-                //     "comment" => $value->comments->comment,
-                //     "user" => [
-                //         "id" => $value->comments->user->id,
-                //         "username" => $value->comments->user->username,
-                //         "profile" => $value->comments->user->profile,
-                //     ],
-                // ]
-                "comments" => $this->commentData($value->comments)
+                "comments" => $this->commentData($value->comments),
+                "totalLikes" => $value->likes->count(),
+                'isLiked' => (bool) $value->isLiked
             ];
         }
         return [

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LikeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
@@ -36,7 +37,7 @@ Route::group(["prefix" => "user"], function () {
 Route::group(["prefix" => "post"], function () {
     Route::group(["middleware" => "auth:api"], function () {
         Route::post("/", [PostController::class, "store"]);
-        // Route::pos
+        Route::post("/like/{post_id}", [LikeController::class, 'like']);
     });
     Route::get("/", [PostController::class, "display"]);
     Route::get("/{id}", [PostController::class, "specificPost"]);
