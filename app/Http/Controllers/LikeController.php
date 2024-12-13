@@ -17,6 +17,19 @@ class LikeController extends Controller
                 "post_id" => $post_id
             ];
 
+            $like = PostLike::where("user_id", $data["user_id"])->where("post_id", $data["post_id"])->first();
+
+            if ($like) {
+                DB::beginTransaction();
+                $like->delete();
+
+                DB::commit();
+                return response()->json([
+                    "message" => "Post UnLiked Successfully",
+                    "success" => true
+                ], 200);
+            }
+
             DB::beginTransaction();
             $like = PostLike::create($data);
 
@@ -36,29 +49,4 @@ class LikeController extends Controller
         }
     }
 
-    public function unlike($post_id)
-    {
-        try {
-            $data = [
-                "user_id" => auth()->user()->id,
-                "post_id" => $post_id
-            ];
-
-            DB::beginTransaction();
-            PostLike::where("user_id", $data["user_id"])->where("post_id", $data["post_id"])->delete();
-
-            DB::commit();
-            return response()->json([
-                "message" => "Post UnLiked Successfully",
-                "success" => true
-            ], 200);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                "success" => false,
-                "message" => $e->getMessage()
-            ], 500);
-        }
-    }
 }

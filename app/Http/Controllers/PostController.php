@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
+use App\Models\PostLike;
 use Storage;
 use DB;
 use App\Transformers\PostTransformer;
@@ -16,7 +17,7 @@ class PostController extends Controller
 {
     public function display()
     {
-        $post = Post::with(['users', 'comments.user','likes'])->orderBy("created_at", 'desc')->get();
+        $post = Post::with(['users', 'comments.user', 'likes'])->orderBy("created_at", 'desc')->get();
         $res = fractal([$post], new PostTransformer())->toArray();
         return response()->json([
             "status" => "success",
