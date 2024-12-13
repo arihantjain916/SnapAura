@@ -45,4 +45,9 @@ class Post extends Model
         return $this->hasMany(Comment::class, 'post', 'id');
     }
 
+    public function likes()
+    {
+        return $this->hasMany(PostLike::class);
+    }
+
 }
