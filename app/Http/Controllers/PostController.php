@@ -16,7 +16,7 @@ class PostController extends Controller
 {
     public function display()
     {
-        $post = Post::with(['users', 'comments.user'])->orderBy("created_at", 'desc')->get();
+        $post = Post::with(['users', 'comments.user','likes'])->orderBy("created_at", 'desc')->get();
         $res = fractal([$post], new PostTransformer())->toArray();
         return response()->json([
             "status" => "success",
