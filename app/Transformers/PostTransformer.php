@@ -18,7 +18,7 @@ class PostTransformer extends TransformerAbstract
         foreach ($data as $key => $value) {
             $constData[] = [
                 "id" => $value->id,
-                "image" => $value->image,
+                "image" => $this->images($value->images),
                 "caption" => $value->caption,
                 "created_at" => $value->created_at,
                 "user" => [
@@ -49,5 +49,13 @@ class PostTransformer extends TransformerAbstract
             ];
         }
         return $comment;
+    }
+
+    public function images($data){
+        $image = [];
+        foreach ($data as $value) {
+            $image[] = $value->image;
+        }
+        return $image;
     }
 }

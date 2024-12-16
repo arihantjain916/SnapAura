@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
+use App\Models\PostImages;
 use App\Models\PostLike;
 use Storage;
 use DB;
@@ -17,7 +18,7 @@ class PostController extends Controller
 {
     public function display()
     {
-        $post = Post::with(['users', 'comments.user', 'likes'])->orderBy("created_at", 'desc')->get();
+        $post = Post::with(['users', 'comments.user', 'likes', 'images'])->orderBy("created_at", 'desc')->get();
 
         if (auth()->user()) {
             $userId = auth()->user()->id;
@@ -25,6 +26,7 @@ class PostController extends Controller
                 $post->isLiked = (bool) $post->likes->contains('user_id', $userId);
             });
         }
+
         $res = fractal([$post], new PostTransformer())->toArray();
         return response()->json([
             "status" => "success",
@@ -34,7 +36,7 @@ class PostController extends Controller
 
     public function specificPost($id)
     {
-        $post = Post::with('users')->find($id);
+        $post = Post::with('users', 'comments.user', 'likes', 'images')->find($id);
 
         $res = fractal($post, new PostDisplayTransform())->toArray();
 
@@ -54,15 +56,10 @@ class PostController extends Controller
     public function store(PostRequest $request)
     {
         try {
-            $data = [
-                "image" => $this->uploadImage($request->file('image')),
-                "caption" => $request->caption,
-
-            ];
 
             DB::beginTransaction();
 
-            $post = Post::create($data);
+            $post = Post::create(["caption" => $request->caption,]);
 
             if (!$post) {
                 return response()->json([
@@ -74,6 +71,24 @@ class PostController extends Controller
             $hashtags = $this->extractHashtags($request->caption);
 
             $this->syncHashtags($post, $hashtags);
+
+            if ($request->hasFile('image')) {
+                if (is_array($request->file('image'))) {
+                    foreach ($request->file('image') as $file) {
+                        $imagePath = $this->uploadImage($file);
+                        PostImages::create([
+                            "post_id" => $post->id,
+                            "image" => $imagePath
+                        ]);
+                    }
+                } else {
+                    $imagePath = $this->uploadImage($request->file('image'));
+                    PostImages::create([
+                        "post_id" => $post->id,
+                        "image" => $imagePath
+                    ]);
+                }
+            }
 
             DB::commit();
 
