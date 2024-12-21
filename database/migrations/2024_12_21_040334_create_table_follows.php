@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid("id")->primary();
             $table->foreignUuid("follower_id")->constrained("users")->onDelete("cascade")->unique();
             $table->foreignUuid("followed_id")->constrained("users")->onDelete("cascade")->unique();
+            $table->enum("status", ["pending", "accepted", "rejected"])->default("pending");
             $table->timestamps();
         });
     }
