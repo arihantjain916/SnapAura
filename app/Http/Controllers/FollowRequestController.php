@@ -44,4 +44,26 @@ class FollowRequestController extends Controller
 
         return response()->json(['status' => true, 'message' => 'Follow request sent successfully'], 200);
     }
+
+    public function accept($id)
+    {
+        $user_id = auth()->user()->id;
+
+        $follow = Follow::where('id', $id)
+            ->where('followed_id', $user_id)
+            ->first();
+
+        if (!$follow) {
+            return response()->json([
+                "status" => "error",
+                "message" => "Follow request not found"
+            ], 404);
+        }
+
+        $follow->update([
+            'status' => 'accepted'
+        ]);
+
+        return response()->json(['status' => true, 'message' => 'Follow request accepted successfully'], 200);
+    }
 }
