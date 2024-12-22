@@ -18,7 +18,15 @@ class PostController extends Controller
 {
     public function display()
     {
-        $post = Post::with(['users', 'comments.user', 'likes', 'images'])->orderBy("created_at", 'desc')->get();
+        $post = null;
+        $currentUser = auth()->user();
+        if ($currentUser->following()->get()->isEmpty()) {
+            return response()->json([
+                "status" => "error",
+                "message" => "Please follow someone first"
+            ], 500);
+        }
+        $post = Post::whereIn('user_id', $currentUser->following()->pluck('id'))->with(['users', 'comments.user', 'likes', 'images'])->orderBy("created_at", 'desc')->get();
 
         if (auth()->user()) {
             $userId = auth()->user()->id;
