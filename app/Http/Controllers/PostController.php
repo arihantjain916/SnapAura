@@ -26,7 +26,14 @@ class PostController extends Controller
                 "message" => "Please follow someone first"
             ], 500);
         }
-        $post = Post::whereIn('user_id', $currentUser->following()->pluck('id'))->with(['users', 'comments.user', 'likes', 'images'])->orderBy("created_at", 'desc')->get();
+        $post = Post::whereIn(
+            'user_id',
+            $currentUser->following()->where('follows.status', 'accepted')->pluck('followed_id')
+        )
+            ->orWhere("user_id", $currentUser->id)
+            ->with(['users', 'comments.user', 'likes', 'images'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         if (auth()->user()) {
             $userId = auth()->user()->id;
