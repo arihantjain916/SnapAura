@@ -20,32 +20,31 @@ class PostController extends Controller
     {
         $post = null;
         $currentUser = auth()->user();
+
+        $post = Post::with(['users', 'comments.user', 'likes', 'images'])->orderBy('created_at', 'desc');
+
         if ($currentUser->following()->get()->isEmpty()) {
-            return response()->json([
-                "status" => "error",
-                "message" => "Please follow someone first"
-            ], 500);
-        }
-        $post = Post::whereIn(
-            'user_id',
-            $currentUser->following()->where('follows.status', 'accepted')->pluck('followed_id')
-        )
-            ->orWhere("user_id", $currentUser->id)
-            ->with(['users', 'comments.user', 'likes', 'images'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+            $post->where("user_id", $currentUser->id);
+        } else {
+            $post->whereIn(
+                'user_id',
+                $currentUser->following()->where('follows.status', 'accepted')->pluck('followed_id')
+            )
+                ->orWhere("user_id", $currentUser->id);
 
-        if (auth()->user()) {
-            $userId = auth()->user()->id;
-            $post->each(function ($post) use ($userId) {
-                $post->isLiked = (bool) $post->likes->contains('user_id', $userId);
-            });
+            if (auth()->user()) {
+                $userId = auth()->user()->id;
+                $post->each(function ($post) use ($userId) {
+                    $post->isLiked = (bool) $post->likes->contains('user_id', $userId);
+                });
+            }
         }
 
-        $res = fractal([$post], new PostTransformer())->toArray();
+        $posts = $post->orderBy('created_at', 'desc')->get();
+        $res = fractal([$posts], new PostTransformer())->toArray();
         return response()->json([
             "status" => "success",
-            "data" => $res['data'][0][0]
+            "data" => $res['data'][0][0] ?? []
         ], 200);
     }
 
