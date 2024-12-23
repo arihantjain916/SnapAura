@@ -68,6 +68,22 @@ class PostController extends Controller
         ], 200);
     }
 
+    public function fetchPostofUser()
+    {
+        try {
+            $post = Post::with('users', 'comments.user', 'likes', 'images')->where("user_id", auth()->user()->id)->get();
+            $res = fractal([$post], new PostTransformer())->toArray();
+            return response()->json([
+                "status" => "success",
+                "data" => $res['data'][0][0]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "error" => $e->getMessage()
+            ], 500);
+        }
+    }
     public function store(PostRequest $request)
     {
         try {
