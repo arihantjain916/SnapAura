@@ -31,6 +31,8 @@ Route::group(["prefix" => "user"], function () {
         Route::put("update/profile", [AuthController::class, "updateProfile"]);
         Route::get("logout", [AuthController::class, "logout"]);
         Route::put("reset/password", [AuthController::class, "passwordReset"]);
+
+        Route::get("/post", [PostController::class, "fetchPostofUser"]);
     });
 });
 
@@ -41,7 +43,6 @@ Route::group(["prefix" => "post"], function () {
     });
     Route::get("/", [PostController::class, "display"]);
     Route::get("/{id}", [PostController::class, "specificPost"]);
-
 });
 
 Route::group(["prefix" => "comment"], function () {
