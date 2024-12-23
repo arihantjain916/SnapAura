@@ -18,7 +18,22 @@ class PostController extends Controller
 {
     public function display()
     {
-        $post = Post::with(['users', 'comments.user', 'likes', 'images'])->orderBy("created_at", 'desc')->get();
+        $post = null;
+        $currentUser = auth()->user();
+        if ($currentUser->following()->get()->isEmpty()) {
+            return response()->json([
+                "status" => "error",
+                "message" => "Please follow someone first"
+            ], 500);
+        }
+        $post = Post::whereIn(
+            'user_id',
+            $currentUser->following()->where('follows.status', 'accepted')->pluck('followed_id')
+        )
+            ->orWhere("user_id", $currentUser->id)
+            ->with(['users', 'comments.user', 'likes', 'images'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         if (auth()->user()) {
             $userId = auth()->user()->id;
@@ -53,6 +68,22 @@ class PostController extends Controller
         ], 200);
     }
 
+    public function fetchPostofUser()
+    {
+        try {
+            $post = Post::with('users', 'comments.user', 'likes', 'images')->where("user_id", auth()->user()->id)->get();
+            $res = fractal([$post], new PostTransformer())->toArray();
+            return response()->json([
+                "status" => "success",
+                "data" => $res['data'][0][0]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "error" => $e->getMessage()
+            ], 500);
+        }
+    }
     public function store(PostRequest $request)
     {
         try {
