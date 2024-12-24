@@ -261,5 +261,32 @@ class AuthController extends Controller
         }
     }
 
-    public function handleGoogleCallback(){}
+    public function handleGoogleCallback()
+    {
+        try {
+            $socialiteUser = Socialite::driver('google')->stateless()->user();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Invalid credentials provided.'], 422);
+        }
+
+        $user = User::firstOrCreate(
+            ['email' => $socialiteUser->getEmail()],
+            [
+                'name' => $socialiteUser->getName(),
+                'provider' => 'google',
+                'provider_id' => $socialiteUser->getId(),
+                'email_verified_at' => now(),
+                'password' => bcrypt(Str::random(16)),
+                'profile' => $socialiteUser->getAvatar(),
+                'username' => $socialiteUser->getName()
+            ]
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Login successfully',
+            'token' => Auth::login($user),
+            'data' => $user
+        ], 200);
+    }
 }
