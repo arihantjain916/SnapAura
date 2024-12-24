@@ -289,4 +289,12 @@ class AuthController extends Controller
             'data' => $user
         ], 200);
     }
+
+    public function handleGitHubLogin(){
+        $token = Socialite::driver('github')->stateless()->redirect()->getTargetUrl();
+        return response()->json([
+            'status' => 'success',
+            'url' => $token
+        ], 200);
+    }
 }
