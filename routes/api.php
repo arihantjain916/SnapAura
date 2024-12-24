@@ -74,4 +74,6 @@ Route::group(["prefix" => "tag"], function () {
 Route::group(["prefix" => "oauth"], function () {
     Route::get("/google", [AuthController::class, "handleGoogleLogin"]);
     Route::get("/google/callback", [AuthController::class, "handleGoogleCallback"]);
+    Route::get("/github", [AuthController::class, "handleGitHubLogin"]);
+    Route::get("/github/callback", [AuthController::class, "handleGitHubCallback"]);
 });
