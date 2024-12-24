@@ -70,3 +70,8 @@ Route::group(["prefix" => "tag"], function () {
         Route::get('/', [TagController::class, 'getAllTags']);
     });
 });
+
+Route::group(["prefix" => "oauth"], function () {
+    Route::get("/google", [AuthController::class, "handleGoogleLogin"]);
+    Route::get("/google/callback", [AuthController::class, "handleGoogleCallback"]);
+});
