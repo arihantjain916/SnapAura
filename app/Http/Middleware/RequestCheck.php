@@ -16,11 +16,10 @@ class RequestCheck
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-        if (!$request->hasHeader('SECRET_KEY')) {
+        if (!$request->hasHeader('SECRET-KEY') || $request->header('SECRET-KEY') != env('SECRET_KEY')) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Missing SECRET_KEY header',
+                'message' => 'Either Secret key is missing or not correct',
             ], 400);
         }
 
