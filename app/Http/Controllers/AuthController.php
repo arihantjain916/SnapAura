@@ -6,8 +6,8 @@ use App\Mail\EmailVerification;
 use App\Models\User;
 use Auth;
 use DB;
-use Http;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
 use Mail;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Storage;
@@ -242,5 +242,88 @@ class AuthController extends Controller
         $uploadedImageUrl = Storage::disk('public')->url($image_uploaded_path);
 
         return $uploadedImageUrl;
+    }
+
+    public function handleGoogleLogin()
+    {
+        try {
+            $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
+
+            return response()->json([
+                'status' => 'success',
+                'url' => $url
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $socialiteUser = Socialite::driver('google')->stateless()->user();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Invalid credentials provided.'], 422);
+        }
+
+        $user = User::firstOrCreate(
+            ['email' => $socialiteUser->getEmail()],
+            [
+                'name' => $socialiteUser->getName(),
+                'provider' => 'google',
+                'provider_id' => $socialiteUser->getId(),
+                'email_verified_at' => now(),
+                'password' => bcrypt(Str::random(16)),
+                'profile' => $socialiteUser->getAvatar(),
+                'username' => $socialiteUser->getName()
+            ]
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Login successfully',
+            'token' => Auth::login($user),
+            'data' => $user
+        ], 200);
+    }
+
+    public function handleGitHubLogin(){
+        $token = Socialite::driver('github')->stateless()->redirect()->getTargetUrl();
+        return response()->json([
+            'status' => 'success',
+            'url' => $token
+        ], 200);
+    }
+
+    public function handleGitHubCallback()
+    {
+        try {
+            $socialiteUser = Socialite::driver('github')->stateless()->user();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Invalid credentials provided.'], 422);
+        }
+
+        $user = User::firstOrCreate(
+            ['email' => $socialiteUser->getEmail()],
+            [
+                'name' => $socialiteUser->getName(),
+                'provider' => 'google',
+                'provider_id' => $socialiteUser->getId(),
+                'email_verified_at' => now(),
+                'password' => bcrypt(Str::random(16)),
+                'profile' => $socialiteUser->getAvatar(),
+                'username' => $socialiteUser->getName()
+            ]
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Login successfully',
+            'token' => Auth::login($user),
+            'data' => $user
+        ], 200);
     }
 }

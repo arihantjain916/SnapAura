@@ -19,7 +19,9 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at',
         "remember_token",
         "profile",
-        "username"
+        "username",
+        'provider',
+        'provider_id'
     ];
 
     /**
@@ -32,6 +34,8 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
         "created_at",
         "updated_at",
+        'provider',
+        'provider_id'
     ];
 
     /**
