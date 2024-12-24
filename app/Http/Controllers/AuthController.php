@@ -6,8 +6,8 @@ use App\Mail\EmailVerification;
 use App\Models\User;
 use Auth;
 use DB;
-use Http;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
 use Mail;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Storage;
@@ -243,4 +243,23 @@ class AuthController extends Controller
 
         return $uploadedImageUrl;
     }
+
+    public function handleGoogleLogin()
+    {
+        try {
+            $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
+
+            return response()->json([
+                'status' => 'success',
+                'url' => $url
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function handleGoogleCallback(){}
 }
