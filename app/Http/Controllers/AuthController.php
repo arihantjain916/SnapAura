@@ -290,7 +290,8 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function handleGitHubLogin(){
+    public function handleGitHubLogin()
+    {
         $token = Socialite::driver('github')->stateless()->redirect()->getTargetUrl();
         return response()->json([
             'status' => 'success',
@@ -323,6 +324,21 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Login successfully',
             'token' => Auth::login($user),
+            'data' => $user
+        ], 200);
+    }
+
+    public function sendUserInfo($id)
+    {
+        $user = User::find($id);
+        if(!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User not found'
+            ], 404);
+        }
+        return response()->json([
+            'status' => 'success',
             'data' => $user
         ], 200);
     }
