@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\SearchController;
 use App\Http\Middleware\RequestCheck;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -82,3 +83,5 @@ Route::group(["prefix" => "oauth"], function () {
 Route::group(["middleware" => RequestCheck::class], function () {
     Route::get("/user/info/{id}",[AuthController::class,'sendUserInfo']);
 });
+
+Route::get("/search/{name}",[SearchController::class,'search']);
