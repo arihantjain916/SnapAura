@@ -15,4 +15,20 @@ class SearchController extends Controller
             "data" => $user
         ]);
     }
+
+    public function searchProfile($name)
+    {
+        $user = User::with(["followers","following","posts.likes"])->where("username", $name)->first();
+
+        if ($user) {
+            return response()->json([
+                "success" => true,
+                "data" => $user
+            ], 200);
+        }
+        return response()->json([
+            "success" => false,
+            "data" => "User not found"
+        ], 404);
+    }
 }
