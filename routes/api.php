@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LikeController;
+use App\Http\Middleware\RequestCheck;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
@@ -76,4 +77,8 @@ Route::group(["prefix" => "oauth"], function () {
     Route::get("/google/callback", [AuthController::class, "handleGoogleCallback"]);
     Route::get("/github", [AuthController::class, "handleGitHubLogin"]);
     Route::get("/github/callback", [AuthController::class, "handleGitHubCallback"]);
+});
+
+Route::group(["middleware" => RequestCheck::class], function () {
+    Route::get("/user/info/{id}",[AuthController::class,'sendUserInfo']);
 });
