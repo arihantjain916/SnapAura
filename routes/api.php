@@ -81,7 +81,10 @@ Route::group(["prefix" => "oauth"], function () {
 });
 
 Route::group(["middleware" => RequestCheck::class], function () {
-    Route::get("/user/info/{id}",[AuthController::class,'sendUserInfo']);
+    Route::get("/user/info/{id}", [AuthController::class, 'sendUserInfo']);
 });
 
-Route::get("/search/{name}",[SearchController::class,'search']);
+Route::group(["prefix" => "search"], function () {
+    Route::get("/{name}", [SearchController::class, 'search']);
+    Route::get("/profile/{name}", [SearchController::class, 'searchProfile']);
+});
