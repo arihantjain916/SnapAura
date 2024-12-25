@@ -18,7 +18,7 @@ class SearchController extends Controller
 
     public function searchProfile($name)
     {
-        $user = User::with(["followers","following","posts.likes"])->where("username", $name)->first();
+        $user = User::with(["followers", "following", "posts.likes", "posts.images", 'posts.comments.user'])->where("username", $name)->first();
 
         if ($user) {
             return response()->json([
