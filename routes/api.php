@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FollowRequestController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\SearchController;
 use App\Http\Middleware\RequestCheck;
@@ -70,6 +71,13 @@ Route::group(["prefix" => "tag"], function () {
     Route::group(["middleware" => "auth:api"], function () {
         Route::get('{tagName}', [TagController::class, 'getPostsByTag']);
         Route::get('/', [TagController::class, 'getAllTags']);
+    });
+});
+
+Route::group(["prefix" => "follow/request"], function () {
+    Route::group(["middleware" => "auth:api"], function () {
+        Route::get("/send/{id}", [FollowRequestController::class, "send"]);
+        Route::get("/unfollow/{id}", [FollowRequestController::class, "unfollow"]);
     });
 });
 
