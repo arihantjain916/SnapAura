@@ -28,11 +28,17 @@ class FollowRequestController extends Controller
                 "message" => "You can't follow yourself"
             ], 404);
         }
+
         $existingRequest = Follow::where('follower_id', $user_id)
             ->where('followed_id', $follower_id)
             ->first();
 
         if ($existingRequest) {
+            if ($existingRequest->status === 'rejected') {
+                $existingRequest->update(['status' => 'pending']);
+                return response()->json(['status' => true, 'message' => 'Follow request sent successfully'], 200);
+            }
+
             return response()->json(['status' => false, 'message' => 'Follow request already sent'], 400);
         }
 
@@ -44,6 +50,7 @@ class FollowRequestController extends Controller
 
         return response()->json(['status' => true, 'message' => 'Follow request sent successfully'], 200);
     }
+
 
     public function accept($id)
     {

@@ -26,34 +26,45 @@ class SearchController extends Controller
         $query = User::with(["followers", "following", "posts.likes", "posts.images", 'posts.comments.user'])
             ->where("username", $name);
 
+        $user = $query->first();
+
+        if (!$user) {
+            return response()->json([
+                "success" => false,
+                "data" => "User not found"
+            ], 404);
+        }
 
         if ($isToken) {
-            $user = $query->first();
             $user->isFollowing = Follow::where("follower_id", $isToken->id)
                 ->where("followed_id", $user->id)
+                ->where("status", "accepted")
                 ->exists();
-        } else {
-            $user = $query->first();
+
+            $follow = Follow::where("follower_id", $isToken->id)
+                ->where("followed_id", $user->id)
+                ->first();
+                
+            if ($follow) {
+                $user->followStatus = $follow->status;
+            }
+            //  else {
+            //     $user->followStatus = 'not following';
+            // }
         }
 
-        if ($user) {
-            return response()->json([
-                "success" => true,
-                "data" => $user
-            ], 200);
-        }
 
         return response()->json([
-            "success" => false,
-            "data" => "User not found"
-        ], 404);
+            "success" => true,
+            "data" => $user
+        ], 200);
     }
 
 
     public function checkToken($request)
     {
         $bearer = $request->bearerToken();
-        
+
         if (isset($bearer) && $bearer !== "undefined" && $bearer) {
             $user = JWTAuth::parseToken()->authenticate();
             return $user;
