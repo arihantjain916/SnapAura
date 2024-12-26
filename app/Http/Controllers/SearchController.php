@@ -33,7 +33,7 @@ class SearchController extends Controller
                 ->where("followed_id", $user->id)
                 ->exists();
         } else {
-            $user = $query->get();
+            $user = $query->first();
         }
 
         if ($user) {
@@ -53,7 +53,8 @@ class SearchController extends Controller
     public function checkToken($request)
     {
         $bearer = $request->bearerToken();
-        if ($bearer) {
+        
+        if (isset($bearer) && $bearer !== "undefined" && $bearer) {
             $user = JWTAuth::parseToken()->authenticate();
             return $user;
         }
