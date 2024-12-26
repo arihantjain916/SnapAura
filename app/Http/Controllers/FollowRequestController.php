@@ -95,4 +95,31 @@ class FollowRequestController extends Controller
 
         return response()->json(['status' => true, 'message' => 'Follow request rejected successfully'], 200);
     }
+
+    public function unfollow($id)
+    {
+        $user_id = auth()->user()->id;
+        $follower_id = $id;
+        try {
+            $follow = Follow::where("follower_id", $user_id)
+                ->where("followed_id", $follower_id)
+                ->first();
+
+            if (!$follow) {
+                return response()->json([
+                    "status" => "error",
+                    "message" => "Follow request not found"
+                ], 404);
+            }
+
+            $follow->delete();
+
+            return response()->json(['status' => true, 'message' => 'Follow request deleted successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => "error",
+                "message" => "Something went wrong"
+            ], 500);
+        }
+    }
 }
