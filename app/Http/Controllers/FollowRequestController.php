@@ -114,7 +114,7 @@ class FollowRequestController extends Controller
 
             $follow->delete();
 
-            return response()->json(['status' => true, 'message' => 'Follow request deleted successfully'], 200);
+            return response()->json(['status' => true, 'message' => 'User unfollowed successfully'], 200);
         } catch (\Exception $e) {
             return response()->json([
                 "status" => "error",
