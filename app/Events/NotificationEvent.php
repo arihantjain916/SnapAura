@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Notification;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -19,13 +20,15 @@ class NotificationEvent implements ShouldBroadcast
 
     public $data;
     public $user;
+    public $post;
     /**
      * Create a new event instance.
      */
-    public function __construct(Notification $data, User $user)
+    public function __construct(Notification $data, User $user, Post $post=null)
     {
         $this->data = $data;
         $this->user = $user;
+        $this->post = $post;
     }
 
     /**
