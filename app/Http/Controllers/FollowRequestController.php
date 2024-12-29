@@ -138,10 +138,10 @@ class FollowRequestController extends Controller
         }
     }
 
-    private function sendNotification($user, $follower_id, $follow_id)
+    private function sendNotification($user, $follower, $follow_id)
     {
         $notificationData = [
-            "user_id" => $follower_id->id,
+            "user_id" => $follower->id,
             "message" => "{$user->username} sent you a follow request",
             "type" => "success",
             "is_read" => 0,
@@ -149,7 +149,9 @@ class FollowRequestController extends Controller
             "action_type" => "follow"
         ];
 
-        $notification = Notification::create($notificationData);
-        event(new NotificationEvent($notification, $user, $follower_id));
+        $notificationSave = Notification::create($notificationData);
+        $notification = Notification::with("user")->where("id", $notificationSave->id)->first();
+
+        event(new NotificationEvent($notification, $user));
     }
 }
