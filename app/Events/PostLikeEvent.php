@@ -2,9 +2,6 @@
 
 namespace App\Events;
 
-use App\Models\Notification;
-use App\Models\Post;
-use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,23 +9,19 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Database\Eloquent\Collection;
 
-class NotificationEvent implements ShouldBroadcast
+class PostLikeEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    public $data;
-    public $user;
     public $post;
+    public $user;
     /**
      * Create a new event instance.
      */
-    public function __construct(Notification $data, User $user, Post $post=null)
+    public function __construct($post, $user)
     {
-        $this->data = $data;
-        $this->user = $user;
         $this->post = $post;
+        $this->user = $user;
     }
 
     /**
@@ -39,12 +32,12 @@ class NotificationEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('notification.' . $this->data->user_id),
+            new Channel("like" . $this->post->user_id),
         ];
     }
 
     public function broadcastAs()
     {
-        return 'notification';
+        return 'notification.like';
     }
 }
