@@ -142,7 +142,7 @@ class FollowRequestController extends Controller
     {
         $notificationData = [
             "user_id" => $follower_id->id,
-            "message" => "{$user->name} sent you a follow request",
+            "message" => "{$user->username} sent you a follow request",
             "type" => "success",
             "is_read" => 0,
             "link" => route("follow.accept", $follow_id),

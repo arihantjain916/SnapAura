@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationEvent;
 use App\Http\Requests\CreateLikeRequest;
+use App\Models\Post;
 use App\Models\PostLike;
 use DB;
 use Illuminate\Http\Request;
+use Notification;
 
 class LikeController extends Controller
 {
@@ -18,6 +21,7 @@ class LikeController extends Controller
             ];
 
             $like = PostLike::where("user_id", $data["user_id"])->where("post_id", $data["post_id"])->first();
+            $post = Post::find($data["post_id"]);
 
             if ($like) {
                 DB::beginTransaction();
@@ -33,6 +37,8 @@ class LikeController extends Controller
             DB::beginTransaction();
             $like = PostLike::create($data);
 
+            $this->sendNotification(auth()->user(), $post);
+
             DB::commit();
             return response()->json([
                 "message" => "Post Liked Successfully",
@@ -47,6 +53,20 @@ class LikeController extends Controller
                 "message" => $e->getMessage()
             ], 500);
         }
+    }
+
+    private function sendNotification($user, $post)
+    {
+        $notificationData = [
+            "user_id" => $post->user_id,
+            "message" => "{$user->username} Like your post",
+            "type" => "success",
+            "is_read" => 0,
+            "action_type" => "like"
+        ];
+
+        $notification = Notification::create($notificationData);
+        // event(new NotificationEvent($notification, $user, $follower_id));
     }
 
 }
