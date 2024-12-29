@@ -78,6 +78,8 @@ Route::group(["prefix" => "follow/request"], function () {
     Route::group(["middleware" => "auth:api"], function () {
         Route::get("/send/{id}", [FollowRequestController::class, "send"]);
         Route::get("/unfollow/{id}", [FollowRequestController::class, "unfollow"]);
+        Route::get("/accept/{id}", [FollowRequestController::class, "accept"]);
+        Route::get("/reject/{id}", [FollowRequestController::class, "reject"]);
     });
 });
 
