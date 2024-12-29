@@ -11,6 +11,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Database\Eloquent\Collection;
 
 class NotificationEvent implements ShouldBroadcast
 {
@@ -18,15 +19,13 @@ class NotificationEvent implements ShouldBroadcast
 
     public $data;
     public $user;
-    public $follower_id;
     /**
      * Create a new event instance.
      */
-    public function __construct(Notification $data, User $user, User $follower_id)
+    public function __construct(Notification $data, User $user)
     {
         $this->data = $data;
         $this->user = $user;
-        $this->follower_id = $follower_id;
     }
 
     /**
@@ -37,12 +36,12 @@ class NotificationEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('notification.' . $this->follower_id->username),
+            new Channel('notification.' . $this->data->user_id),
         ];
     }
 
     public function broadcastAs()
     {
-        return 'notification.follow';
+        return 'notification';
     }
 }
