@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationEvent;
 use App\Models\Follow;
+use App\Models\Notification;
 use App\Models\User;
-use Illuminate\Http\Request;
+
 
 class FollowRequestController extends Controller
 {
     public function send($id)
     {
-        $user_id = auth()->user()->id;
+        $user = auth()->user();
         $follower_id = $id;
 
         $isIdExist = User::find($id);
-
         if (!$isIdExist) {
             return response()->json([
                 "status" => "error",
@@ -22,33 +23,47 @@ class FollowRequestController extends Controller
             ], 404);
         }
 
-        if ($user_id == $follower_id) {
+        if ($user->id == $follower_id) {
             return response()->json([
                 "status" => "error",
                 "message" => "You can't follow yourself"
-            ], 404);
+            ], 400);
         }
 
-        $existingRequest = Follow::where('follower_id', $user_id)
+        $follower_details = User::find($follower_id);
+
+        $existingRequest = Follow::where('follower_id', $user->id)
             ->where('followed_id', $follower_id)
             ->first();
 
         if ($existingRequest) {
             if ($existingRequest->status === 'rejected') {
                 $existingRequest->update(['status' => 'pending']);
-                return response()->json(['status' => true, 'message' => 'Follow request sent successfully'], 200);
+                $this->sendNotification($user, $follower_details, $existingRequest->id);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Follow request sent successfully'
+                ], 200);
             }
 
-            return response()->json(['status' => false, 'message' => 'Follow request already sent'], 400);
+            return response()->json([
+                'status' => false,
+                'message' => 'Follow request already sent, notification sent again'
+            ], 200);
         }
 
-        Follow::create([
-            'follower_id' => $user_id,
+        $follow = Follow::create([
+            'follower_id' => $user->id,
             'followed_id' => $follower_id,
             'status' => 'pending',
         ]);
 
-        return response()->json(['status' => true, 'message' => 'Follow request sent successfully'], 200);
+        $this->sendNotification($user, $follower_details, $follow->id);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Follow request sent successfully'
+        ], 200);
     }
 
 
@@ -121,5 +136,19 @@ class FollowRequestController extends Controller
                 "message" => "Something went wrong"
             ], 500);
         }
+    }
+
+    private function sendNotification($user, $follower_id, $follow_id)
+    {
+        $notificationData = [
+            "user_id" => $follower_id->id,
+            "message" => "{$user->name} sent you a follow request",
+            "type" => "success",
+            "is_read" => 0,
+            "link" => route("follow.accept", $follow_id),
+        ];
+
+        $notification = Notification::create($notificationData);
+        event(new NotificationEvent($notification, $user, $follower_id));
     }
 }
