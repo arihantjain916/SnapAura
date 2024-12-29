@@ -8,7 +8,7 @@ use App\Models\Post;
 use App\Models\PostLike;
 use DB;
 use Illuminate\Http\Request;
-use Notification;
+use App\Models\Notification;
 
 class LikeController extends Controller
 {
@@ -65,8 +65,10 @@ class LikeController extends Controller
             "action_type" => "like"
         ];
 
-        $notification = Notification::create($notificationData);
-        // event(new NotificationEvent($notification, $user, $follower_id));
+        $notificationSave = Notification::create($notificationData);
+
+        $notification = Notification::with("user")->where("id", $notificationSave->id)->first();
+        event(new NotificationEvent($notification, $user, $post));
     }
 
 }
