@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\FollowRequestController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Middleware\RequestCheck;
 use Illuminate\Support\Facades\Route;
@@ -78,6 +79,8 @@ Route::group(["prefix" => "follow/request"], function () {
     Route::group(["middleware" => "auth:api"], function () {
         Route::get("/send/{id}", [FollowRequestController::class, "send"]);
         Route::get("/unfollow/{id}", [FollowRequestController::class, "unfollow"]);
+        Route::get("/accept/{id}", [FollowRequestController::class, "accept"])->name("follow.accept");
+        Route::get("/reject/{id}", [FollowRequestController::class, "reject"]);
     });
 });
 
@@ -95,4 +98,12 @@ Route::group(["middleware" => RequestCheck::class], function () {
 Route::group(["prefix" => "search"], function () {
     Route::get("/{name}", [SearchController::class, 'search']);
     Route::get("/profile/{name}", [SearchController::class, 'searchProfile']);
+});
+
+Route::get("/temp", [NotificationController::class, "temp"]);
+
+Route::group(["prefix" => "notification"], function () {
+    Route::group(["middleware" => "auth:api"], function () {
+        Route::get("/fetch", [NotificationController::class, "fetch"]);
+    });
 });
