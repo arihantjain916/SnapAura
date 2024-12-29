@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Events\NotificationEvent;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Notification;
 
 class NotificationController extends Controller
 {
@@ -25,5 +25,9 @@ class NotificationController extends Controller
         $user = User::first();
         $second = User::where("username", "arihant_getgrahak")->first();
         event(new NotificationEvent($notification, $user, $second));
+
+        return response()->json([
+            "status" => true
+        ]);
     }
 }
