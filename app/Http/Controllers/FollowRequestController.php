@@ -146,6 +146,7 @@ class FollowRequestController extends Controller
             "type" => "success",
             "is_read" => 0,
             "link" => route("follow.accept", $follow_id),
+            "action_type" => "follow"
         ];
 
         $notification = Notification::create($notificationData);
