@@ -19,16 +19,12 @@ class NotificationEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $data;
-    public $user;
-    public $post;
     /**
      * Create a new event instance.
      */
-    public function __construct(Notification $data, User $user, Post $post=null)
+    public function __construct(Notification $data)
     {
         $this->data = $data;
-        $this->user = $user;
-        $this->post = $post;
     }
 
     /**

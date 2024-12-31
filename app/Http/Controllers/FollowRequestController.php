@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Events\NotificationEvent;
 use App\Models\Follow;
 use App\Models\Notification;
+use App\Models\NotificationMeta;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 
 class FollowRequestController extends Controller
@@ -42,7 +44,8 @@ class FollowRequestController extends Controller
                 $this->sendNotification($user, $follower_details, $existingRequest->id);
                 return response()->json([
                     'status' => true,
-                    'message' => 'Follow request sent successfully'
+                    'message' => 'Follow request sent successfully',
+                    'id' => $existingRequest->id
                 ], 200);
             }
 
@@ -62,18 +65,18 @@ class FollowRequestController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Follow request sent successfully'
+            'message' => 'Follow request sent successfully',
+            'id' => $follow->id
         ], 200);
     }
 
 
-    public function accept($id)
+    public function accept(Request $request, $id)
     {
-        $user_id = auth()->user()->id;
+        $notification_id = $request->id;
 
-        $follow = Follow::where('id', $id)
-            ->where('followed_id', $user_id)
-            ->first();
+        $follow = Follow::where('id', $id)->first();
+
 
         if (!$follow) {
             return response()->json([
@@ -86,15 +89,20 @@ class FollowRequestController extends Controller
             'status' => 'accepted'
         ]);
 
+        $notification_meta = NotificationMeta::where("notification_id", $notification_id)->first();
+        $notification_meta->update([
+            "button_text" => "Following",
+            "link" => route("follow.unfollow", $follow->id)
+        ]);
+
         return response()->json(['status' => true, 'message' => 'Follow request accepted successfully'], 200);
     }
 
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
-        $user_id = auth()->user()->id;
+        $notification_id = $request->id;
 
         $follow = Follow::where('id', $id)
-            ->where('followed_id', $user_id)
             ->first();
 
         if (!$follow) {
@@ -108,16 +116,19 @@ class FollowRequestController extends Controller
             'status' => 'rejected'
         ]);
 
+        $notification_meta = NotificationMeta::where("notification_id", $notification_id)->first();
+        $notification_meta->update([
+            "button_text" => "Follow",
+            "link" => route("follow.accept", $follow->follower_id)
+        ]);
         return response()->json(['status' => true, 'message' => 'Follow request rejected successfully'], 200);
     }
 
-    public function unfollow($id)
+    public function unfollow(Request $request, $id)
     {
-        $user_id = auth()->user()->id;
-        $follower_id = $id;
         try {
-            $follow = Follow::where("follower_id", $user_id)
-                ->where("followed_id", $follower_id)
+            $notification_id = $request->id;
+            $follow = Follow::where('id', $id)
                 ->first();
 
             if (!$follow) {
@@ -128,6 +139,16 @@ class FollowRequestController extends Controller
             }
 
             $follow->delete();
+
+            if ($notification_id) {
+                $notification_meta = NotificationMeta::where("notification_id", $notification_id)->first();
+                if ($notification_meta) {
+                    $notification_meta->update([
+                        "button_text" => null,
+                        "link" => null
+                    ]);
+                }
+            }
 
             return response()->json(['status' => true, 'message' => 'User unfollowed successfully'], 200);
         } catch (\Exception $e) {
@@ -145,13 +166,18 @@ class FollowRequestController extends Controller
             "message" => "{$user->username} sent you a follow request",
             "type" => "success",
             "is_read" => 0,
-            "link" => route("follow.accept", $follow_id),
             "action_type" => "follow"
         ];
 
         $notificationSave = Notification::create($notificationData);
-        $notification = Notification::with("user")->where("id", $notificationSave->id)->first();
 
-        event(new NotificationEvent($notification, $user));
+        NotificationMeta::create([
+            "notification_id" => $notificationSave->id,
+            "user_id" => $user->id,
+            "link" => route("follow.accept", $follow_id),
+        ]);
+        $notification = Notification::with(["user", "meta.post", "meta.user"])->where("id", $notificationSave->id)->first();
+
+        event(new NotificationEvent($notification));
     }
 }

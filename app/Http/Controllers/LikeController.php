@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\NotificationEvent;
 use App\Http\Requests\CreateLikeRequest;
+use App\Models\NotificationMeta;
 use App\Models\Post;
 use App\Models\PostLike;
 use DB;
@@ -66,9 +67,14 @@ class LikeController extends Controller
         ];
 
         $notificationSave = Notification::create($notificationData);
+        NotificationMeta::create([
+            "notification_id" => $notificationSave->id,
+            "post_id" => $post->id,
+            "user_id" => $user->id
+        ]);
 
-        $notification = Notification::with("user")->where("id", $notificationSave->id)->first();
-        event(new NotificationEvent($notification, $user, $post));
+        $notification = Notification::with(["user", "meta.post","meta.user"])->where("id", $notificationSave->id)->first();
+        event(new NotificationEvent($notification));
     }
 
 }

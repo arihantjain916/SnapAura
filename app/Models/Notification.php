@@ -14,7 +14,6 @@ class Notification extends Model
         'user_id',
         'message',
         'type',
-        'link',
         'is_read',
         'read_at',
         'action_type',
@@ -23,5 +22,9 @@ class Notification extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function meta(){
+        return $this->hasOne(NotificationMeta::class);
     }
 }
