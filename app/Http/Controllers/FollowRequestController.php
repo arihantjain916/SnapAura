@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\NotificationEvent;
 use App\Models\Follow;
 use App\Models\Notification;
+use App\Models\NotificationMeta;
 use App\Models\User;
 
 
@@ -150,7 +151,12 @@ class FollowRequestController extends Controller
         ];
 
         $notificationSave = Notification::create($notificationData);
-        $notification = Notification::with("user")->where("id", $notificationSave->id)->first();
+
+        NotificationMeta::create([
+            "notification_id" => $notificationSave->id,
+            "user_id" => $user->id
+        ]);
+        $notification = Notification::with(["user", "meta"])->where("id", $notificationSave->id)->first();
 
         event(new NotificationEvent($notification, $user));
     }

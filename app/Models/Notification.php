@@ -26,6 +26,6 @@ class Notification extends Model
     }
 
     public function meta(){
-        return $this->hasMany(NotificationMeta::class);
+        return $this->hasOne(NotificationMeta::class);
     }
 }
