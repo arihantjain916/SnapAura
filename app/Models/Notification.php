@@ -24,4 +24,8 @@ class Notification extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function meta(){
+        return $this->hasMany(NotificationMeta::class);
+    }
 }
