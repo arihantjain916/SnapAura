@@ -140,11 +140,15 @@ class FollowRequestController extends Controller
 
             $follow->delete();
 
-            $notification_meta = NotificationMeta::where("notification_id", $notification_id)->first();
-            $notification_meta->update([
-                "button_text" => null,
-                "link" => null
-            ]);
+            if ($notification_id) {
+                $notification_meta = NotificationMeta::where("notification_id", $notification_id)->first();
+                if ($notification_meta) {
+                    $notification_meta->update([
+                        "button_text" => null,
+                        "link" => null
+                    ]);
+                }
+            }
 
             return response()->json(['status' => true, 'message' => 'User unfollowed successfully'], 200);
         } catch (\Exception $e) {
