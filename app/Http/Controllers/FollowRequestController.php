@@ -156,8 +156,8 @@ class FollowRequestController extends Controller
             "notification_id" => $notificationSave->id,
             "user_id" => $user->id
         ]);
-        $notification = Notification::with(["user", "meta"])->where("id", $notificationSave->id)->first();
+        $notification = Notification::with(["user", "meta.post","meta.user"])->where("id", $notificationSave->id)->first();
 
-        event(new NotificationEvent($notification, $user));
+        event(new NotificationEvent($notification));
     }
 }

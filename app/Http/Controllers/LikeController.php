@@ -73,8 +73,8 @@ class LikeController extends Controller
             "user_id" => $user->id
         ]);
 
-        $notification = Notification::with(["user","meta"])->where("id", $notificationSave->id)->first();
-        event(new NotificationEvent($notification, $user, $post));
+        $notification = Notification::with(["user", "meta.post","meta.user"])->where("id", $notificationSave->id)->first();
+        event(new NotificationEvent($notification));
     }
 
 }
