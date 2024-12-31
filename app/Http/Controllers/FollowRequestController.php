@@ -7,6 +7,7 @@ use App\Models\Follow;
 use App\Models\Notification;
 use App\Models\NotificationMeta;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 
 class FollowRequestController extends Controller
@@ -68,13 +69,15 @@ class FollowRequestController extends Controller
     }
 
 
-    public function accept($id)
+    public function accept(Request $request, $id)
     {
+        $notification_id = $request->id;
         $user_id = auth()->user()->id;
 
         $follow = Follow::where('id', $id)
             ->where('followed_id', $user_id)
             ->first();
+
 
         if (!$follow) {
             return response()->json([
@@ -85,6 +88,12 @@ class FollowRequestController extends Controller
 
         $follow->update([
             'status' => 'accepted'
+        ]);
+
+        $notification_meta = NotificationMeta::where("notification_id", $notification_id)->first();
+        $notification_meta->update([
+            "button_text" => "Following",
+            "link" => null
         ]);
 
         return response()->json(['status' => true, 'message' => 'Follow request accepted successfully'], 200);
@@ -146,7 +155,6 @@ class FollowRequestController extends Controller
             "message" => "{$user->username} sent you a follow request",
             "type" => "success",
             "is_read" => 0,
-            "link" => route("follow.accept", $follow_id),
             "action_type" => "follow"
         ];
 
@@ -154,9 +162,10 @@ class FollowRequestController extends Controller
 
         NotificationMeta::create([
             "notification_id" => $notificationSave->id,
-            "user_id" => $user->id
+            "user_id" => $user->id,
+            "link" => route("follow.accept", $follow_id),
         ]);
-        $notification = Notification::with(["user", "meta.post","meta.user"])->where("id", $notificationSave->id)->first();
+        $notification = Notification::with(["user", "meta.post", "meta.user"])->where("id", $notificationSave->id)->first();
 
         event(new NotificationEvent($notification));
     }
