@@ -14,6 +14,7 @@ class NotificationMeta extends Model
         "post_id",
         "notification_id",
         "button_text",
+        "link"
     ];
 
     public function notification()
