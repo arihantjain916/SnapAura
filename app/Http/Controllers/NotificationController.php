@@ -11,7 +11,7 @@ class NotificationController extends Controller
 {
     public function fetch()
     {
-        $notifications = Notification::with(["user", "meta.post","meta.user"])->where("user_id", auth()->user()->id)->get();
+        $notifications = Notification::with(["user", "meta.post","meta.user"])->where("user_id", auth()->user()->id)->orderBy('created_at', 'desc')->get();
         return response()->json([
             "status" => true,
             "data" => $notifications ?? []
