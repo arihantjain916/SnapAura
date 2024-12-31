@@ -72,11 +72,8 @@ class FollowRequestController extends Controller
     public function accept(Request $request, $id)
     {
         $notification_id = $request->id;
-        $user_id = auth()->user()->id;
 
-        $follow = Follow::where('id', $id)
-            ->where('followed_id', $user_id)
-            ->first();
+        $follow = Follow::where('id', $id)->first();
 
 
         if (!$follow) {
@@ -93,18 +90,17 @@ class FollowRequestController extends Controller
         $notification_meta = NotificationMeta::where("notification_id", $notification_id)->first();
         $notification_meta->update([
             "button_text" => "Following",
-            "link" => null
+            "link" => route("follow.unfollow", $follow->id)
         ]);
 
         return response()->json(['status' => true, 'message' => 'Follow request accepted successfully'], 200);
     }
 
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
-        $user_id = auth()->user()->id;
+        $notification_id = $request->id;
 
         $follow = Follow::where('id', $id)
-            ->where('followed_id', $user_id)
             ->first();
 
         if (!$follow) {
@@ -118,16 +114,19 @@ class FollowRequestController extends Controller
             'status' => 'rejected'
         ]);
 
+        $notification_meta = NotificationMeta::where("notification_id", $notification_id)->first();
+        $notification_meta->update([
+            "button_text" => "Follow",
+            "link" => route("follow.accept", $follow->follower_id)
+        ]);
         return response()->json(['status' => true, 'message' => 'Follow request rejected successfully'], 200);
     }
 
-    public function unfollow($id)
+    public function unfollow(Request $request, $id)
     {
-        $user_id = auth()->user()->id;
-        $follower_id = $id;
         try {
-            $follow = Follow::where("follower_id", $user_id)
-                ->where("followed_id", $follower_id)
+            $notification_id = $request->id;
+            $follow = Follow::where('id', $id)
                 ->first();
 
             if (!$follow) {
@@ -138,6 +137,12 @@ class FollowRequestController extends Controller
             }
 
             $follow->delete();
+
+            $notification_meta = NotificationMeta::where("notification_id", $notification_id)->first();
+            $notification_meta->update([
+                "button_text" => null,
+                "link" => null
+            ]);
 
             return response()->json(['status' => true, 'message' => 'User unfollowed successfully'], 200);
         } catch (\Exception $e) {
