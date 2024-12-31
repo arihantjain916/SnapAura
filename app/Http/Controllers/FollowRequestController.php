@@ -44,7 +44,8 @@ class FollowRequestController extends Controller
                 $this->sendNotification($user, $follower_details, $existingRequest->id);
                 return response()->json([
                     'status' => true,
-                    'message' => 'Follow request sent successfully'
+                    'message' => 'Follow request sent successfully',
+                    'id' => $existingRequest->id
                 ], 200);
             }
 
@@ -64,7 +65,8 @@ class FollowRequestController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Follow request sent successfully'
+            'message' => 'Follow request sent successfully',
+            'id' => $follow->id
         ], 200);
     }
 
