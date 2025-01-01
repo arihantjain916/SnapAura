@@ -93,30 +93,39 @@ class AuthController extends Controller
 
     public function passwordReset(Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            "password" => "required|string|min:6",
-        ]);
-        if ($validate->fails()) {
-            return response()->json([
-                "status" => "error",
-                "message" => $validate->errors()
+        try {
+            $validate = Validator::make($request->all(), [
+                "password" => "required|string|min:6",
+                "email" => "required|email|exists:users,email"
             ]);
-        }
-        $user = User::find(Auth::user()->id);
-        if ($user) {
-            $user->update([
+
+            if ($validate->fails()) {
+                return response()->json([
+                    "status" => "error",
+                    "message" => $validate->errors()
+                ]);
+            }
+
+            DB::beginTransaction();
+
+            User::find($request->email)->first()->update([
                 'password' => $request->password
             ]);
+
+            DB::commit();
+
             return response()->json([
-                'success' => true,
-                'message' => 'Password reset successfully',
-                'data' => $user
-            ]);
+                "status" => "success",
+                "message" => "Password changed successfully",
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                "status" => "error",
+                "message" => $e->getMessage(),
+            ], 500);
+
         }
-        return response()->json([
-            'success' => false,
-            'message' => 'User not found',
-        ]);
     }
 
     public function verifyEmail(string $userId, string $token)
@@ -331,7 +340,7 @@ class AuthController extends Controller
     public function sendUserInfo($id)
     {
         $user = User::find($id);
-        if(!$user) {
+        if (!$user) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'User not found'
