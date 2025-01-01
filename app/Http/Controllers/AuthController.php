@@ -108,7 +108,7 @@ class AuthController extends Controller
 
             DB::beginTransaction();
 
-            User::find($request->email)->first()->update([
+            User::where("email",$request->email)->first()->update([
                 'password' => $request->password
             ]);
 
